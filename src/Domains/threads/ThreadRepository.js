@@ -11,7 +11,11 @@ class ThreadRepository {
         throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
 
-    async deleteComment(userId, commentId) {
+    async verifyCommentOwner(userId, commentId) {
+        throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    }
+
+    async deleteComment(commentId) {
         throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
 
@@ -19,7 +23,11 @@ class ThreadRepository {
         throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
 
-    async deleteReply(userId, replyId) {
+    async verifyReplyOwner(userId, replyId) {
+        throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    }
+
+    async deleteReply(replyId) {
         throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
 }
