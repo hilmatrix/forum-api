@@ -1,16 +1,23 @@
 const NewComment = require('../../Domains/threads/entities/NewComment');
 
 class ThreadAddCommentUseCase {
-    constructor({threadRepository}) {
+    constructor({threadRepository, authenticationTokenManager}) {
       this.threadRepository = threadRepository;
+      this.authenticationTokenManager = authenticationTokenManager;
     }
   
     async execute(useCasePayload) {
-      const newComment = new NewComment(useCasePayload);
-      const commentId = await this.threadRepository.addComment(
-        newComment.userId, newComment.threadId, newComment.content, newComment.date);
+      const {username, id } = await this.authenticationTokenManager.decodePayload(useCasePayload.authorization);
+      useCasePayload.userId = id;
 
-      return commentId;
+      await this.threadRepository.verifyThreadExist(useCasePayload.threadId);
+
+      const newComment = new NewComment(useCasePayload);
+
+      const commentId = await this.threadRepository.addComment(
+        newComment.userId, newComment.threadId, newComment.content);
+
+      return {id : commentId, content : newComment.content, owner : username};
     }
 }
   

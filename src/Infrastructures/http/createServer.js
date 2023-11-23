@@ -1,8 +1,10 @@
 const Hapi = require('@hapi/hapi');
 const ClientError = require('../../Commons/exceptions/ClientError');
+const AuthenticationError = require('../../Commons/exceptions/AuthenticationError');
 const DomainErrorTranslator = require('../../Commons/exceptions/DomainErrorTranslator');
 const users = require('../../Interfaces/http/api/users');
 const authentications = require('../../Interfaces/http/api/authentications');
+const threads = require('../../Interfaces/http/api/threads');
 
 const createServer = async (container) => {
   const server = Hapi.server({
@@ -19,7 +21,12 @@ const createServer = async (container) => {
       plugin: authentications,
       options: { container },
     },
+    {
+      plugin: threads,
+      options: { container },
+    },
   ]);
+  
 
   server.ext('onPreResponse', (request, h) => {
     // mendapatkan konteks response dari request
@@ -31,6 +38,15 @@ const createServer = async (container) => {
 
       // penanganan client error secara internal.
       if (translatedError instanceof ClientError) {
+        const newResponse = h.response({
+          status: 'fail',
+          message: translatedError.message,
+        });
+        newResponse.code(translatedError.statusCode);
+        return newResponse;
+      }
+
+      if (translatedError instanceof AuthenticationError) {
         const newResponse = h.response({
           status: 'fail',
           message: translatedError.message,

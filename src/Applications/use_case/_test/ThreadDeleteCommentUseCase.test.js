@@ -3,7 +3,7 @@ const ThreadDeleteCommentUseCase = require('../ThreadDeleteCommentUseCase');
 
 describe('ThreadDeleteCommentUseCase', () => {
     
-    it('should orchestrating the thread get action correctly', async () => {
+    it('should orchestrating the delete comment action correctly', async () => {
         const useCasePayload = {
             userId: 'user-12345',
             commentId: 'comment-12345'

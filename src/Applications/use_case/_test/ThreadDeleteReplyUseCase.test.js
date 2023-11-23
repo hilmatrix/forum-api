@@ -3,7 +3,7 @@ const ThreadDeleteReplyUseCase = require('../ThreadDeleteReplyUseCase');
 
 describe('ThreadDeleteReplyUseCase', () => {
     
-    it('should orchestrating the thread get action correctly', async () => {
+    it('should orchestrating the delete reply action correctly', async () => {
         const useCasePayload = {
             userId: 'user-12345',
             replyId: 'reply-12345'

@@ -19,7 +19,6 @@ exports.up = pgm => {
         content: {
           type: 'TEXT',
           notNull: true,
-          unique: true,
         },
         deleted: {
             type: 'bool',
