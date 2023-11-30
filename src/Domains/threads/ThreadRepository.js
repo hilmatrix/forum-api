@@ -3,11 +3,15 @@ class ThreadRepository {
         throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
 
-    async getThread(threadId) {
+    async threadGet(threadId) {
         throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
 
     async addComment(userId, threadId, content, date) {
+        throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    }
+
+    async verifyCommentExist(threadId, commentId) {
         throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
 
@@ -19,9 +23,14 @@ class ThreadRepository {
         throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
 
-    async addReply(userId, commentId, content, date) {
+    async addReply(userId, commentId, content) {
         throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     }
+
+    async verifyReplyExist(commentId, replyId) {
+        throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    }
+
 
     async verifyReplyOwner(userId, replyId) {
         throw new Error('THREAD_REPOSITORY.METHOD_NOT_IMPLEMENTED');

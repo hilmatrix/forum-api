@@ -1,3 +1,5 @@
+const InvariantError = require('../../../Commons/exceptions/InvariantError');
+
 class NewComment {
     constructor(payload) {
       this.userId = payload.userId;
@@ -11,12 +13,12 @@ class NewComment {
     verifyPayload(payload) {
       const { userId, commentId, content, date} = payload;
   
-      if (!userId || !commentId || !content || !date) {
-        throw new Error('NEW_REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
+      if (!userId || !commentId || !content) {
+        throw new InvariantError('NEW_REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
       }
   
-      if (typeof userId !== 'string' || typeof commentId !== 'string' || typeof content !== 'string' || typeof date !== 'string') {
-        throw new Error('NEW_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION');
+      if (typeof userId !== 'string' || typeof commentId !== 'string' || typeof content !== 'string') {
+        throw new InvariantError('NEW_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION');
       }
     }
 }

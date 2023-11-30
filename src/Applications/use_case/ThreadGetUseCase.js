@@ -4,7 +4,7 @@ class ThreadGetUseCase {
     }
   
     async execute(useCasePayload) {
-      const thread = await this.threadRepository.getThread(useCasePayload.threadId);
+      const thread = await this.threadRepository.threadGet(useCasePayload.threadId);
       const { username } = await this.threadRepository.threadGetUsername(thread.user_id)
       const comments = await this.threadRepository.threadGetComments(useCasePayload.threadId)
 
