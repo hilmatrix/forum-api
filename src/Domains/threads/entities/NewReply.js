@@ -11,7 +11,7 @@ class NewComment {
     }
   
     verifyPayload(payload) {
-      const { userId, commentId, content, date} = payload;
+      const { userId, commentId, content} = payload;
   
       if (!userId || !commentId || !content) {
         throw new InvariantError('NEW_REPLY.NOT_CONTAIN_NEEDED_PROPERTY');

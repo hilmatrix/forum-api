@@ -5,8 +5,7 @@ describe('NewThread entities', () => {
     // Arrange
     const payload = {
         userId: 'hilmatrix',
-        title: 'judul',
-        body: 'body',
+        body: 'body'
     };
 
     // Action & Assert
@@ -18,8 +17,7 @@ describe('NewThread entities', () => {
     const payload = {
         userId: 'hilmatrix',
         title: 'judul',
-        body: 'body',
-        date: 54321
+        body: 12345
     };
 
     // Action & Assert
@@ -31,8 +29,7 @@ describe('NewThread entities', () => {
     const payload = {
         userId: 'hilmatrix',
         title: 'judul',
-        body: 'badan',
-        date: 'tanggal'
+        body: 'badan'
     };
 
     // Action
@@ -43,6 +40,5 @@ describe('NewThread entities', () => {
     expect(newThread.userId).toEqual(payload.userId);
     expect(newThread.title).toEqual(payload.title);
     expect(newThread.body).toEqual(payload.body);
-    expect(newThread.date).toEqual(payload.date);
   });
 });

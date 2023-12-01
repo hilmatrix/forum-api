@@ -10,13 +10,25 @@ describe('ThreadGetUseCase', () => {
 
         const mockThreadRepository = new ThreadRepository();
 
-        mockThreadRepository.getThread = jest.fn().mockImplementation(() => Promise.resolve('thread-12345'));
+        mockThreadRepository.threadGet = jest.fn().mockImplementation(() => Promise.resolve(
+            {id : 'thread-12345', title : 'judul', user_id : 'user-12345', body : 'body', date : 'date-12345'}));
+        mockThreadRepository.threadGetUsername = jest.fn().mockImplementation(() => Promise.resolve({username : 'hilmatrix'}));
+        mockThreadRepository.threadGetComments = jest.fn().mockImplementation(() => Promise.resolve('comments'));
   
         const getThreadUseCase = new ThreadGetUseCase({threadRepository: mockThreadRepository});
 
-        await getThreadUseCase.execute(useCasePayload);
+        const thread = await getThreadUseCase.execute(useCasePayload);
 
-        expect(mockThreadRepository.getThread).toBeCalledWith(useCasePayload.threadId);
+        expect(mockThreadRepository.threadGet).toBeCalledWith(useCasePayload.threadId);
+        expect(mockThreadRepository.threadGetUsername).toBeCalledWith('user-12345');
+        expect(mockThreadRepository.threadGetComments).toBeCalledWith('thread-12345');
+
+        expect(thread.id).toStrictEqual('thread-12345');
+        expect(thread.title).toStrictEqual('judul');
+        expect(thread.username).toStrictEqual('hilmatrix');
+        expect(thread.body).toStrictEqual('body');
+        expect(thread.date).toStrictEqual('date-12345');
+        expect(thread.comments).toStrictEqual('comments');
     })
 })
 

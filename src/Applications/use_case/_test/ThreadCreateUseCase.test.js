@@ -22,13 +22,15 @@ describe('ThreadCreateUseCase', () => {
 
         const createThreadUseCase = new ThreadCreateUseCase(
             {threadRepository: mockThreadRepository, authenticationTokenManager : mockAuthenticationTokenManager});
-        const threadId = await createThreadUseCase.execute(useCasePayload);
+        const thread = await createThreadUseCase.execute(useCasePayload);
 
 
         expect(mockAuthenticationTokenManager.decodePayload).toBeCalledWith(useCasePayload.authorization);
         expect(mockThreadRepository.createThread).toBeCalledWith(
             useCasePayload.userId, useCasePayload.title, useCasePayload.body);
 
-        expect(threadId).toStrictEqual('thread-12345');
+        expect(thread.id).toStrictEqual('thread-12345');
+        expect(thread.owner).toStrictEqual('hilmatrix');
+        expect(thread.title).toStrictEqual('judul');
     })
 })

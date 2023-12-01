@@ -26,7 +26,7 @@ const RefreshAuthenticationUseCase = require('../Applications/use_case/RefreshAu
 
 // thread
 const ThreadRepository = require('../Domains/threads/ThreadRepository');
-const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostgres');
+const ThreadRepositoryPostgres = require('./repository/ThreadRepositoryPostGres');
 const ThreadAddCommentUseCase = require('../Applications/use_case/ThreadAddCommentUseCase');
 const ThreadAddReplyUseCase = require('../Applications/use_case/ThreadAddReplyUseCase');
 const ThreadCreateUseCase = require('../Applications/use_case/ThreadCreateUseCase');
