@@ -1,8 +1,10 @@
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
-const ThreadAddReplyUseCase = require('../ThreadAddReplyUseCase');
+const CommentRepository = require('../../../Domains/comments/CommentRepository');
+const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
+const ReplyAddUseCase = require('../ReplyAddUseCase');
 const AuthenticationTokenManager = require('../../security/AuthenticationTokenManager');
 
-describe('ThreadAddReplyUseCase', () => {
+describe('ReplyAddUseCase', () => {
 
     it('should orchestrating the add reply action correctly', async () => {
         const useCasePayload = {
@@ -13,25 +15,29 @@ describe('ThreadAddReplyUseCase', () => {
         };
 
         const mockThreadRepository = new ThreadRepository();
+        const mockCommentRepository = new CommentRepository();
+        const mockReplyRepository = new ReplyRepository();
         const mockAuthenticationTokenManager = new AuthenticationTokenManager();
 
         mockThreadRepository.verifyThreadExist = jest.fn().mockImplementation(() => Promise.resolve());
-        mockThreadRepository.verifyCommentExist = jest.fn().mockImplementation(() => Promise.resolve());
-        mockThreadRepository.addReply = jest.fn().mockImplementation(() => Promise.resolve('reply-12345'));
+        mockCommentRepository.verifyCommentExist = jest.fn().mockImplementation(() => Promise.resolve());
+        mockReplyRepository.addReply = jest.fn().mockImplementation(() => Promise.resolve('reply-12345'));
 
         mockAuthenticationTokenManager.decodePayload = jest.fn().mockImplementation(() => Promise.resolve(
             {username : "hilmatrix", id : "hilmatrix-123"}
         ));
   
-        const addReplyUseCase = new ThreadAddReplyUseCase({threadRepository: mockThreadRepository,
+        const addReplyUseCase = new ReplyAddUseCase({threadRepository: mockThreadRepository,
+            commentRepository: mockCommentRepository,
+            replyRepository: mockReplyRepository,
             authenticationTokenManager : mockAuthenticationTokenManager});
 
         const reply = await addReplyUseCase.execute(useCasePayload);
 
         expect(mockAuthenticationTokenManager.decodePayload).toBeCalledWith(useCasePayload.authorization);
         expect(mockThreadRepository.verifyThreadExist).toBeCalledWith(useCasePayload.threadId);
-        expect(mockThreadRepository.verifyCommentExist).toBeCalledWith(useCasePayload.threadId, useCasePayload.commentId);
-        expect(mockThreadRepository.addReply).toBeCalledWith(
+        expect(mockCommentRepository.verifyCommentExist).toBeCalledWith(useCasePayload.threadId, useCasePayload.commentId);
+        expect(mockReplyRepository.addReply).toBeCalledWith(
             useCasePayload.userId, useCasePayload.commentId, useCasePayload.content);
 
         expect(reply.id).toStrictEqual('reply-12345');

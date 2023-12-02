@@ -13,7 +13,8 @@ describe('ThreadGetUseCase', () => {
         mockThreadRepository.threadGet = jest.fn().mockImplementation(() => Promise.resolve(
             {id : 'thread-12345', title : 'judul', user_id : 'user-12345', body : 'body', date : 'date-12345'}));
         mockThreadRepository.threadGetUsername = jest.fn().mockImplementation(() => Promise.resolve({username : 'hilmatrix'}));
-        mockThreadRepository.threadGetComments = jest.fn().mockImplementation(() => Promise.resolve('comments'));
+        mockThreadRepository.threadGetComments = jest.fn().mockImplementation(() => Promise.resolve(
+            [{deleted : true, content : 'haha', replies : [{deleted : true, content : 'hihi'}]}] ));
   
         const getThreadUseCase = new ThreadGetUseCase({threadRepository: mockThreadRepository});
 
@@ -28,7 +29,8 @@ describe('ThreadGetUseCase', () => {
         expect(thread.username).toStrictEqual('hilmatrix');
         expect(thread.body).toStrictEqual('body');
         expect(thread.date).toStrictEqual('date-12345');
-        expect(thread.comments).toStrictEqual('comments');
+        expect(thread.comments[0].content).toStrictEqual('**komentar telah dihapus**');
+        expect(thread.comments[0].replies[0].content).toStrictEqual('**balasan telah dihapus**');
     })
 })
 

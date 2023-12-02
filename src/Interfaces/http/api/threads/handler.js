@@ -1,9 +1,9 @@
 const ThreadCreateUseCase = require('../../../../Applications/use_case/ThreadCreateUseCase');
-const ThreadAddCommentUseCase = require('../../../../Applications/use_case/ThreadAddCommentUseCase');
+const CommentAddUseCase = require('../../../../Applications/use_case/CommentAddUseCase');
 const ThreadGetUseCase = require('../../../../Applications/use_case/ThreadGetUseCase');
-const ThreadDeleteCommentUseCase = require('../../../../Applications/use_case/ThreadDeleteCommentUseCase');
-const ThreadAddReplyUseCase = require('../../../../Applications/use_case/ThreadAddReplyUseCase');
-const ThreadDeleteReplyUseCase = require('../../../../Applications/use_case/ThreadDeleteReplyUseCase');
+const CommentDeleteUseCase = require('../../../../Applications/use_case/CommentDeleteUseCase');
+const ReplyAddUseCase = require('../../../../Applications/use_case/ReplyAddUseCase');
+const ReplyDeleteUseCase = require('../../../../Applications/use_case/ReplyDeleteUseCase');
 
 
 const AuthenticationError = require('../../../../Commons/exceptions/AuthenticationError');
@@ -79,7 +79,7 @@ class ThreadsHandler {
       threadId : request.params.threadId,
       content : request.payload.content,
    }
-    const threadAddCommentUseCase = this.container.getInstance(ThreadAddCommentUseCase.name);
+    const threadAddCommentUseCase = this.container.getInstance(CommentAddUseCase.name);
     const {id, content, owner} = await threadAddCommentUseCase.execute(payload)
 
     const response = h.response({
@@ -107,7 +107,7 @@ class ThreadsHandler {
       commentId : request.params.commentId
    }
 
-    const threadDeleteCommentUseCase = this.container.getInstance(ThreadDeleteCommentUseCase.name);
+    const threadDeleteCommentUseCase = this.container.getInstance(CommentDeleteUseCase.name);
     await threadDeleteCommentUseCase.execute(payload);
 
     const response = h.response({
@@ -132,7 +132,7 @@ class ThreadsHandler {
       content : request.payload.content
    }
 
-   const threadAddReplyUseCase = this.container.getInstance(ThreadAddReplyUseCase.name);
+   const threadAddReplyUseCase = this.container.getInstance(ReplyAddUseCase.name);
    const {id, content, owner} = await threadAddReplyUseCase.execute(payload)
 
      const response = h.response({
@@ -161,7 +161,7 @@ class ThreadsHandler {
       replyId : request.params.replyId
    }
 
-    const threadDeleteReplyUseCase = this.container.getInstance(ThreadDeleteReplyUseCase.name);
+    const threadDeleteReplyUseCase = this.container.getInstance(ReplyDeleteUseCase.name);
     await threadDeleteReplyUseCase.execute(payload);
 
     const response = h.response({

@@ -1,8 +1,8 @@
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
-const ThreadDeleteReplyUseCase = require('../ThreadDeleteReplyUseCase');
+const ReplyDeleteUseCase = require('../ReplyDeleteUseCase');
 const AuthenticationTokenManager = require('../../security/AuthenticationTokenManager');
 
-describe('ThreadDeleteReplyUseCase', () => {
+describe('ReplyDeleteUseCase', () => {
     
     it('should orchestrating the delete reply action correctly', async () => {
         const useCasePayload = {
@@ -24,7 +24,7 @@ describe('ThreadDeleteReplyUseCase', () => {
             {username : "hilmatrix", id : "hilmatrix-123"}
         ));
   
-        const deleteReplyUseCase = new ThreadDeleteReplyUseCase({threadRepository: mockThreadRepository,
+        const deleteReplyUseCase = new ReplyDeleteUseCase({threadRepository: mockThreadRepository,
             authenticationTokenManager : mockAuthenticationTokenManager});
 
         await deleteReplyUseCase.execute(useCasePayload);
