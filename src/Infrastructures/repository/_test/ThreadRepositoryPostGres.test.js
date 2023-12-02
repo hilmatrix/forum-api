@@ -175,4 +175,34 @@ describe('ThreadRepositoryPostgres', () => {
             expect(comments[0].replies[0].deleted).toBe(true)
         });
     });
+
+    describe('threadGetUsername function', () => {
+        it('threadGetUsername should throw NotFoundError if no such user Id exist', async () => {
+            const query = {
+                text: 'INSERT INTO users VALUES($1, $2, $3, $4)',
+                values: ['user-12345', 'hilmatrix', '12345678', 'Hilman Mauludin'],
+            };
+          
+            await pool.query(query);
+
+            const threadRepositoryPostgres = new ThreadRepositoryPostGres(pool);
+
+            await expect(threadRepositoryPostgres.threadGetUsername('user')).rejects.toThrowError(NotFoundError);
+        });
+
+        it('threadGetUsername should return correct username', async () => {
+            const query = {
+                text: 'INSERT INTO users VALUES($1, $2, $3, $4)',
+                values: ['user-12345', 'hilmatrix', '12345678', 'Hilman Mauludin'],
+            };
+          
+            await pool.query(query);
+
+            const threadRepositoryPostgres = new ThreadRepositoryPostGres(pool);
+
+            const {username} = await threadRepositoryPostgres.threadGetUsername('user-12345');
+            expect(username).toBe('hilmatrix')
+        });
+    });
+    
 });

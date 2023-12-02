@@ -5,6 +5,7 @@ const ThreadsTableTestHelper = {
         await pool.query('DELETE FROM replies WHERE 1=1');
         await pool.query('DELETE FROM comments WHERE 1=1');
         await pool.query('DELETE FROM threads WHERE 1=1');
+        await pool.query('DELETE FROM users WHERE 1=1');
     }
 };
 
