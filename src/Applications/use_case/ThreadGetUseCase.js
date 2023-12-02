@@ -8,18 +8,19 @@ class ThreadGetUseCase {
       const { username } = await this.threadRepository.threadGetUsername(thread.user_id)
       const comments = await this.threadRepository.threadGetComments(useCasePayload.threadId)
 
-      for(const comment of comments) {
-        if (comment.deleted) {
-          comment.content = '**komentar telah dihapus**';
-        }
-
-        if (comment.replies)
-          for(const reply of comment.replies) {
-            if (reply.deleted) {
-              reply.content = '**balasan telah dihapus**';
-            }
+      if (comments)
+        for(const comment of comments) {
+          if (comment.deleted) {
+            comment.content = '**komentar telah dihapus**';
           }
-      }
+        
+          if (comment.replies)
+            for(const reply of comment.replies) {
+              if (reply.deleted) {
+                reply.content = '**balasan telah dihapus**';
+              }
+            }
+        }
 
       return {id : thread.id, title : thread.title, body : thread.body, 
         date : thread.date, username, comments};
