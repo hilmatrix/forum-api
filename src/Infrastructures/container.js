@@ -23,6 +23,7 @@ const AuthenticationRepository = require('../Domains/authentications/Authenticat
 const AuthenticationRepositoryPostgres = require('./repository/AuthenticationRepositoryPostgres');
 const LogoutUserUseCase = require('../Applications/use_case/LogoutUserUseCase');
 const RefreshAuthenticationUseCase = require('../Applications/use_case/RefreshAuthenticationUseCase');
+const GetIdAndUsernameUseCase = require('../Applications/use_case/GetIdAndUsernameUseCase');
 
 // thread
 const ThreadRepository = require('../Domains/threads/ThreadRepository');
@@ -37,6 +38,8 @@ const CommentAddUseCase = require('../Applications/use_case/CommentAddUseCase');
 const CommentDeleteUseCase = require('../Applications/use_case/CommentDeleteUseCase');
 const ReplyAddUseCase = require('../Applications/use_case/ReplyAddUseCase');
 const ReplyDeleteUseCase = require('../Applications/use_case/ReplyDeleteUseCase');
+
+
 
 
 
@@ -215,10 +218,6 @@ container.register([
         {
           name: 'commentRepository',
           internal: CommentRepository.name,
-        },
-        {
-          name: 'authenticationTokenManager',
-          internal: AuthenticationTokenManager.name,
         }
       ],
     },
@@ -240,10 +239,6 @@ container.register([
         {
           name: 'replyRepository',
           internal: ReplyRepository.name,
-        },
-        {
-          name: 'authenticationTokenManager',
-          internal: AuthenticationTokenManager.name,
         }
       ],
     },
@@ -257,10 +252,6 @@ container.register([
         {
           name: 'threadRepository',
           internal: ThreadRepository.name,
-        },
-        {
-          name: 'authenticationTokenManager',
-          internal: AuthenticationTokenManager.name,
         }
       ],
     },
@@ -287,10 +278,6 @@ container.register([
         {
           name: 'commentRepository',
           internal: CommentRepository.name,
-        },
-        {
-          name: 'authenticationTokenManager',
-          internal: AuthenticationTokenManager.name,
         }
       ],
     },
@@ -308,7 +295,16 @@ container.register([
         {
           name: 'replyRepository',
           internal: ReplyRepository.name,
-        },
+        }
+      ],
+    },
+  },
+  {
+    key: GetIdAndUsernameUseCase.name,
+    Class: GetIdAndUsernameUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
         {
           name: 'authenticationTokenManager',
           internal: AuthenticationTokenManager.name,

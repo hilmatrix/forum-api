@@ -1,3 +1,4 @@
+const GetIdAndUsernameUseCase = require('../../../../Applications/use_case/GetIdAndUsernameUseCase');
 const ThreadCreateUseCase = require('../../../../Applications/use_case/ThreadCreateUseCase');
 const ThreadGetUseCase = require('../../../../Applications/use_case/ThreadGetUseCase');
 const AuthenticationError = require('../../../../Commons/exceptions/AuthenticationError');
@@ -15,9 +16,11 @@ class ThreadsHandler {
       throw new AuthenticationError('Missing authentication');
     }
 
+    const getIdAndUsernameUseCase = this.container.getInstance(GetIdAndUsernameUseCase.name);
+    const {username, id : userId} = await getIdAndUsernameUseCase.execute({authorization});
+
     const payload = {
-       authorization,
-       userId : '',
+       username, userId,
        title : request.payload.title,
        body : request.payload.body,
     }

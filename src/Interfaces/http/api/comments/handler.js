@@ -1,4 +1,4 @@
-
+const GetIdAndUsernameUseCase = require('../../../../Applications/use_case/GetIdAndUsernameUseCase');
 const CommentAddUseCase = require('../../../../Applications/use_case/CommentAddUseCase');
 const CommentDeleteUseCase = require('../../../../Applications/use_case/CommentDeleteUseCase');
 const AuthenticationError = require('../../../../Commons/exceptions/AuthenticationError');
@@ -12,14 +12,15 @@ class CommentsHandler {
     }
 
     async postThreadCommentAddHandler(request, h) {
-        const authorization = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
-        if (!authorization) {
-          throw new AuthenticationError('Missing authentication');
-        }
-    
-        const payload = {
-          authorization,
-          userId : '',
+       const authorization = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
+       if (!authorization) {
+         throw new AuthenticationError('Missing authentication');
+       }
+       const getIdAndUsernameUseCase = this.container.getInstance(GetIdAndUsernameUseCase.name);
+       const {username, id : userId} = await getIdAndUsernameUseCase.execute({authorization});
+
+       const payload = {
+          username, userId,
           threadId : request.params.threadId,
           content : request.payload.content,
        }
@@ -43,10 +44,12 @@ class CommentsHandler {
         if (!authorization) {
           throw new AuthenticationError('Missing authentication');
         }
-    
+
+        const getIdAndUsernameUseCase = this.container.getInstance(GetIdAndUsernameUseCase.name);
+        const {username, id : userId} = await getIdAndUsernameUseCase.execute({authorization});
+
         const payload = {
-          authorization,
-          userId : '',
+          username, userId,
           threadId : request.params.threadId,
           commentId : request.params.commentId
        }

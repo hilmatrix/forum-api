@@ -1,3 +1,4 @@
+const GetIdAndUsernameUseCase = require('../../../../Applications/use_case/GetIdAndUsernameUseCase');
 const ReplyAddUseCase = require('../../../../Applications/use_case/ReplyAddUseCase');
 const ReplyDeleteUseCase = require('../../../../Applications/use_case/ReplyDeleteUseCase');
 const AuthenticationError = require('../../../../Commons/exceptions/AuthenticationError');
@@ -10,14 +11,16 @@ class RepliesHandler {
     }
 
     async postThreadReplyAddHandler(request, h) {
-        const authorization = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
-        if (!authorization) {
-          throw new AuthenticationError('Missing authentication');
-        }
-    
-        const payload = {
-          authorization,
-          userId : '',
+      const authorization = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
+      if (!authorization) {
+        throw new AuthenticationError('Missing authentication');
+      }
+
+      const getIdAndUsernameUseCase = this.container.getInstance(GetIdAndUsernameUseCase.name);
+      const {username, id : userId} = await getIdAndUsernameUseCase.execute({authorization});
+
+      const payload = {
+          username, userId,
           threadId : request.params.threadId,
           commentId : request.params.commentId,
           content : request.payload.content
@@ -39,14 +42,16 @@ class RepliesHandler {
       }
     
       async deleteThreadReplyHandler(request, h) {
-        const authorization = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
-        if (!authorization) {
-          throw new AuthenticationError('Missing authentication');
-        }
-    
-        const payload = {
-          authorization,
-          userId : '',
+       const authorization = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
+       if (!authorization) {
+         throw new AuthenticationError('Missing authentication');
+       } 
+
+       const getIdAndUsernameUseCase = this.container.getInstance(GetIdAndUsernameUseCase.name);
+       const {username, id : userId} = await getIdAndUsernameUseCase.execute({authorization});
+
+       const payload = {
+          username, userId,
           threadId : request.params.threadId,
           commentId : request.params.commentId,
           replyId : request.params.replyId
