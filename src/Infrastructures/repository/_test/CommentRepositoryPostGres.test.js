@@ -1,6 +1,10 @@
 const CommentRepositoryPostGres = require('../CommentRepositoryPostGres');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
+
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
+const InvariantError = require('../../../Commons/exceptions/InvariantError');
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
+
 const pool = require('../../database/postgres/pool');
 
 describe('CommentRepositoryPostGres', () => {
@@ -56,5 +60,28 @@ describe('CommentRepositoryPostGres', () => {
 
             expect(comments[0].deleted).toBe(true)
         });
+
+        it('should return InvariantError when not checking commentId first', async () => {
+            const commentRepositoryPostGres = new CommentRepositoryPostGres(pool);
+            await expect(commentRepositoryPostGres.deleteComment('comment-12345')).rejects.toThrowError(InvariantError);
+        });
     });
+
+    describe('verifyCommentOwner function', () => {
+        it('should throw AuthorizationError if userId is different', async () => {
+            const commentRepositoryPostGres = new CommentRepositoryPostGres(pool);
+            const threadId = await CommentsTableTestHelper.createThread()
+            const commentId = await commentRepositoryPostGres.addComment('user-12345',threadId,'konten');
+            await expect(commentRepositoryPostGres.verifyCommentOwner('user-54321',commentId))
+                .rejects.toThrowError(AuthorizationError);
+        });
+
+        it('should not throw AuthorizationError if userId is same', async () => {
+            const commentRepositoryPostGres = new CommentRepositoryPostGres(pool);
+           const threadId = await CommentsTableTestHelper.createThread()
+            const commentId = await commentRepositoryPostGres.addComment('user-12345',threadId,'konten');
+            await expect(commentRepositoryPostGres.verifyCommentOwner('user-12345',commentId))
+                .resolves.not.toThrowError(AuthorizationError);
+        });
+    });   
 });

@@ -1,7 +1,7 @@
 const pool = require('../src/Infrastructures/database/postgres/pool');
 
 const ThreadsTableTestHelper = {
-    async addCommentAndReply(threadId) {
+    async addComment(threadId) {
         const query = {
             text: 'INSERT INTO comments VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
             values: ['comment-12345', 'user-hilmatrix', threadId, 'konten', false, 'date-12345'],

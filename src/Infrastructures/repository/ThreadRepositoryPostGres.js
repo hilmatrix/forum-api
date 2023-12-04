@@ -2,7 +2,6 @@ const ThreadRepository = require('../../Domains/threads/ThreadRepository');
 const { nanoid } = require('nanoid');
 const moment = require('moment');
 
-const InvariantError = require('../../Commons/exceptions/InvariantError');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 
 
@@ -30,10 +29,6 @@ class ThreadRepositoryPostGres extends ThreadRepository {
             values: [threadId, userId, title, body, this.generateDate()],
         };
         const result = await this.pool.query(query);
-
-        if (result.rows.length === 0) {
-            throw new InvariantError('Thread gagal ditambahkan');
-        }
       
         return result.rows[0].id;
     }

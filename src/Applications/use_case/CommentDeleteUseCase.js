@@ -1,3 +1,5 @@
+const InvariantError = require('../../Commons/exceptions/InvariantError');
+
 class CommentDeleteUseCase {
     constructor({commentRepository}) {
       this.commentRepository = commentRepository;

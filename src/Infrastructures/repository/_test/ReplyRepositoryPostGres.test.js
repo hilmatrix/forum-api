@@ -1,7 +1,11 @@
 
 const ReplyRepositoryPostGres = require('../ReplyRepositoryPostGres');
 const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
+
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
+const InvariantError = require('../../../Commons/exceptions/InvariantError');
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
+
 const pool = require('../../database/postgres/pool');
 
 describe('ReplyRepositoryPostGres', () => {
@@ -57,7 +61,30 @@ describe('ReplyRepositoryPostGres', () => {
 
             expect(comments[0].replies[0].deleted).toBe(true)
         });
+
+        it('should return InvariantError when not checking replyId first', async () => {
+            const replyRepositoryPostGres = new ReplyRepositoryPostGres(pool);
+            await expect(replyRepositoryPostGres.deleteReply('reply-12345')).rejects.toThrowError(InvariantError);
+        });
         
     });
+
+    describe('verifyReplyOwner function', () => {
+        it('should throw AuthorizationError if userId is different', async () => {
+            const replyRepositoryPostGres = new ReplyRepositoryPostGres(pool);
+            const {commentId} = await RepliesTableTestHelper.createThreadWithComment()
+            const replyId = await replyRepositoryPostGres.addReply('user-12345',commentId,'konten');
+            await expect(replyRepositoryPostGres.verifyReplyOwner('user-54321',replyId))
+                .rejects.toThrowError(AuthorizationError);
+        });
+
+        it('should not throw AuthorizationError if userId is same', async () => {
+            const replyRepositoryPostGres = new ReplyRepositoryPostGres(pool);
+            const {commentId} = await RepliesTableTestHelper.createThreadWithComment()
+            const replyId = await replyRepositoryPostGres.addReply('user-12345',commentId,'konten');
+            await expect(replyRepositoryPostGres.verifyReplyOwner('user-12345',replyId))
+                .resolves.not.toThrowError(AuthorizationError);
+        });
+    });   
 });
     

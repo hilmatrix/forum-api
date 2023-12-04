@@ -20,11 +20,11 @@ const CommentsTableTestHelper = {
         
         return result.rows;
     },
-    async cleanTable() {
-        await pool.query('DELETE FROM replies WHERE 1=1');
-        await pool.query('DELETE FROM comments WHERE 1=1');
-        await pool.query('DELETE FROM threads WHERE 1=1');
-        await pool.query('DELETE FROM users WHERE 1=1');
+    async cleanTable(customPool = pool) {
+        await customPool.query('DELETE FROM replies WHERE 1=1');
+        await customPool.query('DELETE FROM comments WHERE 1=1');
+        await customPool.query('DELETE FROM threads WHERE 1=1');
+        await customPool.query('DELETE FROM users WHERE 1=1');
     }
 };
 

@@ -1,5 +1,6 @@
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const ThreadGetUseCase = require('../ThreadGetUseCase');
+const InvariantError = require('../../../Commons/exceptions/InvariantError');
 
 describe('ThreadGetUseCase', () => {
     
@@ -39,6 +40,16 @@ describe('ThreadGetUseCase', () => {
 
         expect(thread.comments[0].content).toStrictEqual('**komentar telah dihapus**');
         expect(thread.comments[0].replies[0].content).toStrictEqual('**balasan telah dihapus**');
+
+        mockThreadRepository.threadGetComments = jest.fn().mockImplementation(() => Promise.resolve(
+            [{deleted : false, content : 'haha', }] ));
+
+        await expect(getThreadUseCase.execute(useCasePayload)).rejects.toThrowError(InvariantError);
+        
+        mockThreadRepository.threadGetComments = jest.fn().mockImplementation(() => Promise.resolve());
+
+        await expect(getThreadUseCase.execute(useCasePayload)).rejects.toThrowError(InvariantError);
+        
     })
 })
 

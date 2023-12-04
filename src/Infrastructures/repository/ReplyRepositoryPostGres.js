@@ -2,9 +2,9 @@ const ReplyRepository = require('../../Domains/replies/ReplyRepository');
 const { nanoid } = require('nanoid');
 const moment = require('moment');
 
-const InvariantError = require('../../Commons/exceptions/InvariantError');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
+const InvariantError = require('../../Commons/exceptions/InvariantError');
 
 class ReplyRepositoryPostGres extends ReplyRepository {
     constructor(pool) {
@@ -31,10 +31,6 @@ class ReplyRepositoryPostGres extends ReplyRepository {
             values: [replyId, userId, commentId, content, false, this.generateDate()],
         };
         const result = await this.pool.query(query);
-    
-        if (result.rows.length === 0) {
-            throw new InvariantError('Reply gagal ditambahkan');
-        }
       
         return result.rows[0].id;
     }

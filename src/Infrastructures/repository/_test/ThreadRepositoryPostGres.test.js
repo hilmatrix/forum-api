@@ -53,7 +53,7 @@ describe('ThreadRepositoryPostgres', () => {
         it('should return thread comments and replies correctly', async () => {
             const threadRepositoryPostgres = new ThreadRepositoryPostGres(pool);
             const threadId = await threadRepositoryPostgres.createThread('user-12345','judul','badan');
-            await ThreadsTableTestHelper.addCommentAndReply(threadId)
+            await ThreadsTableTestHelper.addComment(threadId)
             const comments = await threadRepositoryPostgres.threadGetComments(threadId);
 
             expect(typeof comments).toBe('object')

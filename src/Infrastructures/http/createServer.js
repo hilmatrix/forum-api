@@ -56,15 +56,6 @@ const createServer = async (container) => {
         return newResponse;
       }
 
-      if (translatedError instanceof AuthenticationError) {
-        const newResponse = h.response({
-          status: 'fail',
-          message: translatedError.message,
-        });
-        newResponse.code(translatedError.statusCode);
-        return newResponse;
-      }
-
       // mempertahankan penanganan client error oleh hapi secara native, seperti 404, etc.
       if (!translatedError.isServer) {
         return h.continue;
