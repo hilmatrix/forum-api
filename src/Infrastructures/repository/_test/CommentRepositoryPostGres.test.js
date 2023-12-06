@@ -8,6 +8,16 @@ const AuthorizationError = require('../../../Commons/exceptions/AuthorizationErr
 const pool = require('../../database/postgres/pool');
 
 describe('CommentRepositoryPostGres', () => {
+    beforeEach(async () => {
+        await CommentsTableTestHelper.cleanTable();
+        const query = {
+            text: 'INSERT INTO users VALUES($1, $2, $3, $4)',
+            values: ['user-komentator', 'komentator', '12345678', 'Sang komentator'],
+          };
+      
+        await pool.query(query);
+    });
+
     afterEach(async () => {
         await CommentsTableTestHelper.cleanTable();
       });
@@ -41,12 +51,30 @@ describe('CommentRepositoryPostGres', () => {
         });
     });
 
+        
+    describe('getComments function', () => {
+        it('should return comments correctly', async () => {
+            const commentRepositoryPostGres = new CommentRepositoryPostGres(pool);
+            const threadId = await CommentsTableTestHelper.createThread();
+            await commentRepositoryPostGres.addComment('user-komentator',threadId,'konten');
+            const comments = await commentRepositoryPostGres.getComments(threadId);
+
+            expect(typeof comments).toBe('object')
+            expect(typeof comments[0].id).toBe('string')
+            expect(comments[0].username).toBe('komentator')
+            expect(typeof comments[0].date).toBe('string')
+            expect(comments[0].content).toBe('konten')
+            expect(comments[0].deleted).toBe(false)
+        });
+    });
+    
+
     describe('deleteComment function', () => {
         it('comment deleted should return false at first', async () => {
             const commentRepositoryPostGres = new CommentRepositoryPostGres(pool);
             const threadId = await CommentsTableTestHelper.createThread();
             await commentRepositoryPostGres.addComment('user-12345',threadId,'konten 1');
-            const comments = await CommentsTableTestHelper.getComments(threadId);
+            const comments = await commentRepositoryPostGres.getComments(threadId);
 
             expect(comments[0].deleted).toBe(false)
         });
@@ -56,7 +84,7 @@ describe('CommentRepositoryPostGres', () => {
             const threadId = await CommentsTableTestHelper.createThread();
             const commentId = await commentRepositoryPostGres.addComment('user-12345',threadId,'konten 1');
             await commentRepositoryPostGres.deleteComment(commentId);
-            const comments = await CommentsTableTestHelper.getComments(threadId);
+            const comments = await commentRepositoryPostGres.getComments(threadId);
 
             expect(comments[0].deleted).toBe(true)
         });
@@ -83,5 +111,5 @@ describe('CommentRepositoryPostGres', () => {
             await expect(commentRepositoryPostGres.verifyCommentOwner('user-12345',commentId))
                 .resolves.not.toThrowError(AuthorizationError);
         });
-    });   
+    });
 });

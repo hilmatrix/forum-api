@@ -9,6 +9,16 @@ const AuthorizationError = require('../../../Commons/exceptions/AuthorizationErr
 const pool = require('../../database/postgres/pool');
 
 describe('ReplyRepositoryPostGres', () => {
+    beforeEach(async () => {
+        await RepliesTableTestHelper.cleanTable();
+        const query = {
+            text: 'INSERT INTO users VALUES($1, $2, $3, $4)',
+            values: ['user-pembalas', 'pembalas', '12345678', 'Sang Pembalas'],
+          };
+      
+        await pool.query(query);
+    });
+
     afterEach(async () => {
         await RepliesTableTestHelper.cleanTable();
       });
@@ -42,6 +52,22 @@ describe('ReplyRepositoryPostGres', () => {
         });
     });
 
+    describe('getReplies function', () => {
+        it('should return replies correctly', async () => {
+            const replyRepositoryPostGres = new ReplyRepositoryPostGres(pool);
+            const {commentId} = await RepliesTableTestHelper.createThreadWithComment()
+            await replyRepositoryPostGres.addReply('user-pembalas',commentId,'konten');
+            const replies = await replyRepositoryPostGres.getReplies(commentId);
+
+            expect(typeof replies).toBe('object')
+            expect(typeof replies[0].id).toBe('string')
+            expect(replies[0].username).toBe('pembalas')
+            expect(typeof replies[0].date).toBe('string')
+            expect(replies[0].content).toBe('konten')
+            expect(replies[0].deleted).toBe(false)
+        });
+    });
+
     describe('deleteReply function', () => {
         it('reply deleted should return false at first', async () => {
             const replyRepositoryPostGres = new ReplyRepositoryPostGres(pool);
@@ -49,7 +75,8 @@ describe('ReplyRepositoryPostGres', () => {
             await replyRepositoryPostGres.addReply('user-12345',commentId,'konten');
             const comments = await RepliesTableTestHelper.getComments(threadId);
 
-            expect(comments[0].replies[0].deleted).toBe(false)
+            const replies = await replyRepositoryPostGres.getReplies(comments[0].id)
+            expect(replies[0].deleted).toBe(false)
         });
 
         it('reply deleted should return true after deleted', async () => {
@@ -59,7 +86,8 @@ describe('ReplyRepositoryPostGres', () => {
             await replyRepositoryPostGres.deleteReply(replyId);
             const comments = await RepliesTableTestHelper.getComments(threadId);
 
-            expect(comments[0].replies[0].deleted).toBe(true)
+            const replies = await replyRepositoryPostGres.getReplies(comments[0].id)
+            expect(replies[0].deleted).toBe(true)
         });
 
         it('should return InvariantError when not checking replyId first', async () => {

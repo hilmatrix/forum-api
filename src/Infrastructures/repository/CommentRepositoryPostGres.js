@@ -70,6 +70,17 @@ class CommentRepositoryPostGres extends CommentRepository {
             throw new InvariantError('Komen gagal dihapus');
         }
     }
+
+    async getComments(threadId) {
+        const query = {
+            text: `SELECT comments.id,username,comments.date,content,deleted FROM comments 
+                LEFT JOIN users ON comments.user_id = users.id where thread_id = $1 ORDER BY comments.date`,
+            values: [threadId],
+        };
+        const result = await this.pool.query(query);
+
+        return result.rows;
+    }
 }
 
 module.exports = CommentRepositoryPostGres;

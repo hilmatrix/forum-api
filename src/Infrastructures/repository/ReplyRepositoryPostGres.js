@@ -70,6 +70,17 @@ class ReplyRepositoryPostGres extends ReplyRepository {
             throw new InvariantError('Reply gagal dihapus');
         }
     }
+
+    async getReplies(commentId) {
+        const replyQuery = {
+            text: `SELECT replies.id,username,replies.date,content,deleted FROM replies 
+                LEFT JOIN users ON replies.user_id = users.id where comment_id = $1 ORDER BY replies.date`,
+            values: [commentId],
+        };
+        const replyResult = await this.pool.query(replyQuery);
+
+        return replyResult.rows;
+    }
 }
 
 module.exports = ReplyRepositoryPostGres;

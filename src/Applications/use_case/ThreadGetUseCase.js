@@ -1,17 +1,20 @@
 const InvariantError = require('../../Commons/exceptions/InvariantError');
 
 class ThreadGetUseCase {
-    constructor({threadRepository}) {
+    constructor({threadRepository, commentRepository, replyRepository}) {
       this.threadRepository = threadRepository;
+      this.commentRepository = commentRepository;
+      this.replyRepository = replyRepository;
     }
   
     async execute(useCasePayload) {
       const thread = await this.threadRepository.threadGet(useCasePayload.threadId);
-      const { username } = await this.threadRepository.threadGetUsername(thread.user_id)
-      const comments = await this.threadRepository.threadGetComments(useCasePayload.threadId)
+      const comments = await this.commentRepository.getComments(useCasePayload.threadId)
       
-      if (comments)
+      if (comments) {
         for(const comment of comments) {
+          comment.replies = await this.replyRepository.getReplies(comment.id);
+
           if (comment.deleted) {
             comment.content = '**komentar telah dihapus**';
           }
@@ -25,11 +28,12 @@ class ThreadGetUseCase {
           else
             throw new InvariantError('Terjadi kegagalan di server kami');
         }
+      }
       else
        throw new InvariantError('Terjadi kegagalan di server kami');
 
       return {id : thread.id, title : thread.title, body : thread.body, 
-        date : thread.date, username, comments};
+        date : thread.date, username : thread.username, comments};
     }
 }
   

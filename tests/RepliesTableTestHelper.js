@@ -23,19 +23,6 @@ const RepliesTableTestHelper = {
             values: [threadId],
         };
         const result = await pool.query(query);
-
-        // loop membaca replies
-        for(const row of result.rows) {
-            
-            const replyQuery = {
-                text: `SELECT replies.id,username,replies.date,content,deleted FROM replies 
-                    LEFT JOIN users ON replies.user_id = users.id where comment_id = $1 ORDER BY replies.date`,
-                values: [row.id],
-            };
-            const replyResult = await pool.query(replyQuery);
-
-            row.replies = replyResult.rows;
-        }
         
         return result.rows;
     },

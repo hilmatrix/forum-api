@@ -35,7 +35,8 @@ class ThreadRepositoryPostGres extends ThreadRepository {
 
     async threadGet(threadId) {
         const query = {
-            text: 'SELECT * FROM threads where id = $1',
+            text: `SELECT threads.id,title,body,date,username FROM threads
+                LEFT JOIN users ON threads.user_id = users.id where threads.id = $1`,
             values: [threadId],
         };
         const result = await this.pool.query(query);
@@ -57,45 +58,6 @@ class ThreadRepositoryPostGres extends ThreadRepository {
         if (result.rows.length === 0) {
             throw new NotFoundError('Thread gagal ditemukan');
         }
-    }
-
-    async threadGetUsername(userId) {
-
-        const query = {
-            text: 'SELECT * FROM users where id = $1',
-            values: [userId],
-        };
-        const result = await this.pool.query(query);
-
-        if (result.rows.length === 0) {
-            throw new NotFoundError('User tidak ditemukan');
-        }
-      
-        return result.rows[0];
-    }
-
-    async threadGetComments(threadId) {
-        const query = {
-            text: `SELECT comments.id,username,comments.date,content,deleted FROM comments 
-                LEFT JOIN users ON comments.user_id = users.id where thread_id = $1 ORDER BY comments.date`,
-            values: [threadId],
-        };
-        const result = await this.pool.query(query);
-
-        // loop membaca replies
-        for(const row of result.rows) {
-            
-            const replyQuery = {
-                text: `SELECT replies.id,username,replies.date,content,deleted FROM replies 
-                    LEFT JOIN users ON replies.user_id = users.id where comment_id = $1 ORDER BY replies.date`,
-                values: [row.id],
-            };
-            const replyResult = await this.pool.query(replyQuery);
-
-            row.replies = replyResult.rows;
-        }
-        
-        return result.rows;
     }
 }
 

@@ -1,4 +1,6 @@
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
+const CommentRepository = require('../../../Domains/comments/CommentRepository');
+const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
 const ThreadGetUseCase = require('../ThreadGetUseCase');
 const InvariantError = require('../../../Commons/exceptions/InvariantError');
 
@@ -10,20 +12,31 @@ describe('ThreadGetUseCase', () => {
         };
 
         const mockThreadRepository = new ThreadRepository();
+        const mockCommentRepository = new CommentRepository();
+        const mockReplyRepository = new ReplyRepository();
+
+        mockCommentRepository.getComments = jest.fn().mockImplementation(() => Promise.resolve(
+            [{id : 'comment-1', deleted : false, content : 'haha'}]
+        ));
+
+        mockReplyRepository.getReplies = jest.fn().mockImplementation(() => Promise.resolve(
+            [{id : 'reply-1', deleted : false, content : 'hihi'}]
+        ));
 
         mockThreadRepository.threadGet = jest.fn().mockImplementation(() => Promise.resolve(
-            {id : 'thread-12345', title : 'judul', user_id : 'user-12345', body : 'body', date : 'date-12345'}));
-        mockThreadRepository.threadGetUsername = jest.fn().mockImplementation(() => Promise.resolve({username : 'hilmatrix'}));
-        mockThreadRepository.threadGetComments = jest.fn().mockImplementation(() => Promise.resolve(
-            [{deleted : false, content : 'haha', replies : [{deleted : false, content : 'hihi'}]}] ));
+            {id : 'thread-12345', title : 'judul', user_id : 'user-12345',
+                body : 'body', date : 'date-12345', username : 'hilmatrix'}));
+
   
-        const getThreadUseCase = new ThreadGetUseCase({threadRepository: mockThreadRepository});
+        const getThreadUseCase = new ThreadGetUseCase({threadRepository: mockThreadRepository,
+            commentRepository: mockCommentRepository,replyRepository: mockReplyRepository});
 
         let thread = await getThreadUseCase.execute(useCasePayload);
 
         expect(mockThreadRepository.threadGet).toBeCalledWith(useCasePayload.threadId);
-        expect(mockThreadRepository.threadGetUsername).toBeCalledWith('user-12345');
-        expect(mockThreadRepository.threadGetComments).toBeCalledWith('thread-12345');
+
+        expect(mockCommentRepository.getComments).toBeCalledWith('thread-12345');
+        expect(mockCommentRepository.getComments).toBeCalledWith('thread-12345');
 
         expect(thread.id).toStrictEqual('thread-12345');
         expect(thread.title).toStrictEqual('judul');
@@ -33,23 +46,26 @@ describe('ThreadGetUseCase', () => {
         expect(thread.comments[0].content).toStrictEqual('haha');
         expect(thread.comments[0].replies[0].content).toStrictEqual('hihi');
 
-        mockThreadRepository.threadGetComments = jest.fn().mockImplementation(() => Promise.resolve(
-            [{deleted : true, content : 'haha', replies : [{deleted : true, content : 'hihi'}]}] ));
+        mockCommentRepository.getComments = jest.fn().mockImplementation(() => Promise.resolve(
+            [{id : 'comment-1', deleted : true, content : 'haha'}]
+        ));
+
+        mockReplyRepository.getReplies = jest.fn().mockImplementation(() => Promise.resolve(
+            [{id : 'reply-1', deleted : true, content : 'hihi'}]
+        ));
 
         thread = await getThreadUseCase.execute(useCasePayload);
 
         expect(thread.comments[0].content).toStrictEqual('**komentar telah dihapus**');
         expect(thread.comments[0].replies[0].content).toStrictEqual('**balasan telah dihapus**');
 
-        mockThreadRepository.threadGetComments = jest.fn().mockImplementation(() => Promise.resolve(
-            [{deleted : false, content : 'haha', }] ));
+        mockReplyRepository.getReplies = jest.fn().mockImplementation(() => Promise.resolve(undefined));
 
         await expect(getThreadUseCase.execute(useCasePayload)).rejects.toThrowError(InvariantError);
-        
-        mockThreadRepository.threadGetComments = jest.fn().mockImplementation(() => Promise.resolve());
+
+        mockCommentRepository.getComments = jest.fn().mockImplementation(() => Promise.resolve(undefined));
 
         await expect(getThreadUseCase.execute(useCasePayload)).rejects.toThrowError(InvariantError);
-        
     })
 })
 

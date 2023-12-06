@@ -5,6 +5,16 @@ const pool = require('../../database/postgres/pool');
 
 describe('ThreadRepositoryPostgres', () => {
 
+    beforeEach(async () => {
+        await ThreadsTableTestHelper.cleanTable();
+        const query = {
+            text: 'INSERT INTO users VALUES($1, $2, $3, $4)',
+            values: ['user-12345', 'hilmatrix', '12345678', 'Hilman Mauludin'],
+          };
+      
+        await pool.query(query);
+    });
+
     afterEach(async () => {
       await ThreadsTableTestHelper.cleanTable();
     });
@@ -46,45 +56,11 @@ describe('ThreadRepositoryPostgres', () => {
             const thread = await threadRepositoryPostgres.threadGet(threadId);
 
             expect(typeof thread).toBe('object')
-        });
-    });
-
-    describe('threadGetComments function', () => {
-        it('should return thread comments and replies correctly', async () => {
-            const threadRepositoryPostgres = new ThreadRepositoryPostGres(pool);
-            const threadId = await threadRepositoryPostgres.createThread('user-12345','judul','badan');
-            await ThreadsTableTestHelper.addComment(threadId)
-            const comments = await threadRepositoryPostgres.threadGetComments(threadId);
-
-            expect(typeof comments).toBe('object')
-            expect(typeof comments[0].replies).toBe('object')
-        });
-    });
-
-    describe('threadGetUsername function', () => {
-        it('threadGetUsername should throw NotFoundError if no such user Id exist', async () => {
-            const query = {
-                text: 'INSERT INTO users VALUES($1, $2, $3, $4)',
-                values: ['user-12345', 'hilmatrix', '12345678', 'Hilman Mauludin'],
-            };
-          
-            await pool.query(query);
-            const threadRepositoryPostgres = new ThreadRepositoryPostGres(pool);
-            await expect(threadRepositoryPostgres.threadGetUsername('user')).rejects.toThrowError(NotFoundError);
-        });
-
-        it('threadGetUsername should return correct username', async () => {
-            const query = {
-                text: 'INSERT INTO users VALUES($1, $2, $3, $4)',
-                values: ['user-12345', 'hilmatrix', '12345678', 'Hilman Mauludin'],
-            };
-          
-            await pool.query(query);
-
-            const threadRepositoryPostgres = new ThreadRepositoryPostGres(pool);
-
-            const {username} = await threadRepositoryPostgres.threadGetUsername('user-12345');
-            expect(username).toBe('hilmatrix')
+            expect(typeof thread.id).toBe('string')
+            expect(thread.title).toBe('judul')
+            expect(thread.body).toBe('badan')
+            expect(typeof thread.date).toBe('string')
+            expect(thread.username).toBe('hilmatrix')
         });
     });
     
