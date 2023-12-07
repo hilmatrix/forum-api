@@ -27,11 +27,12 @@ describe('CommentRepositoryPostGres', () => {
       });
 
       describe('addComment function', () => {
-        it('should return type of string', async () => {
+        it('should return type of string and starts with string comment', async () => {
             const commentRepositoryPostGres = new CommentRepositoryPostGres(pool);
             const threadId = await CommentsTableTestHelper.createThread();
             const commentId = await commentRepositoryPostGres.addComment('user-12345',threadId,'konten');
-            expect(typeof commentId).toBe('string')
+            expect(typeof commentId).toStrictEqual('string')
+            expect(commentId.startsWith('comment')).toStrictEqual(true)
         });
     });
 
@@ -59,12 +60,12 @@ describe('CommentRepositoryPostGres', () => {
             await commentRepositoryPostGres.addComment('user-komentator',threadId,'konten');
             const comments = await commentRepositoryPostGres.getComments(threadId);
 
-            expect(typeof comments).toBe('object')
-            expect(typeof comments[0].id).toBe('string')
-            expect(comments[0].username).toBe('komentator')
-            expect(typeof comments[0].date).toBe('string')
-            expect(comments[0].content).toBe('konten')
-            expect(comments[0].deleted).toBe(false)
+            expect(typeof comments).toStrictEqual('object')
+            expect(comments[0].id.startsWith('comment')).toStrictEqual(true)
+            expect(isNaN(Date.parse(comments[0].date))).toStrictEqual(false)
+            expect(comments[0].username).toStrictEqual('komentator')
+            expect(comments[0].content).toStrictEqual('konten')
+            expect(comments[0].deleted).toStrictEqual(false)
         });
     });
     
@@ -76,7 +77,7 @@ describe('CommentRepositoryPostGres', () => {
             await commentRepositoryPostGres.addComment('user-12345',threadId,'konten 1');
             const comments = await commentRepositoryPostGres.getComments(threadId);
 
-            expect(comments[0].deleted).toBe(false)
+            expect(comments[0].deleted).toStrictEqual(false)
         });
 
         it('comment deleted should return true after deleted', async () => {
@@ -86,7 +87,7 @@ describe('CommentRepositoryPostGres', () => {
             await commentRepositoryPostGres.deleteComment(commentId);
             const comments = await commentRepositoryPostGres.getComments(threadId);
 
-            expect(comments[0].deleted).toBe(true)
+            expect(comments[0].deleted).toStrictEqual(true)
         });
 
         it('should return InvariantError when not checking commentId first', async () => {

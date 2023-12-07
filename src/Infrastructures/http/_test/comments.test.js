@@ -52,8 +52,8 @@ describe('/comments endpoint', () => {
           });
     
           const threadResponseJson = JSON.parse(threadResponse.payload);
-          expect(threadResponse.statusCode).toEqual(201);
-          expect(threadResponseJson.status).toEqual('success');
+          expect(threadResponse.statusCode).toStrictEqual(201);
+          expect(threadResponseJson.status).toStrictEqual('success');
 
           threadId = threadResponseJson.data.addedThread.id
     });
@@ -78,8 +78,8 @@ describe('/comments endpoint', () => {
               });
         
               const responseJson = JSON.parse(response.payload);
-              expect(response.statusCode).toEqual(401);
-              expect(responseJson.status).toEqual('fail');
+              expect(response.statusCode).toStrictEqual(401);
+              expect(responseJson.status).toStrictEqual('fail');
         });
 
         it('should response 201 when successful', async () => {
@@ -103,8 +103,8 @@ describe('/comments endpoint', () => {
         
               const responseJson = JSON.parse(response.payload);
 
-              expect(response.statusCode).toEqual(201);
-              expect(responseJson.status).toEqual('success');
+              expect(response.statusCode).toStrictEqual(201);
+              expect(responseJson.status).toStrictEqual('success');
 
               commentId = responseJson.data.addedComment.id
               
@@ -121,8 +121,8 @@ describe('/comments endpoint', () => {
               });
         
               const responseJson = JSON.parse(response.payload);
-              expect(response.statusCode).toEqual(401);
-              expect(responseJson.status).toEqual('fail');
+              expect(response.statusCode).toStrictEqual(401);
+              expect(responseJson.status).toStrictEqual('fail');
         });
 
         it('should response 200 when successful', async () => {
@@ -140,8 +140,8 @@ describe('/comments endpoint', () => {
         
               const responseJson = JSON.parse(response.payload);
 
-              expect(response.statusCode).toEqual(200);
-              expect(responseJson.status).toEqual('success');
+              expect(response.statusCode).toStrictEqual(200);
+              expect(responseJson.status).toStrictEqual('success');
               
         });
     });

@@ -24,10 +24,11 @@ describe('ThreadRepositoryPostgres', () => {
     });
 
     describe('createThread function', () => {
-        it('should return type of string', async () => {
+        it('should return type of string and starts with string thread', async () => {
             const threadRepositoryPostgres = new ThreadRepositoryPostGres(pool);
             const threadId = await threadRepositoryPostgres.createThread('user-12345','judul','badan');
-            expect(typeof threadId).toBe('string')
+            expect(typeof threadId).toStrictEqual('string')
+            expect(threadId.startsWith('thread')).toStrictEqual(true)
         });
     });
 
@@ -55,12 +56,12 @@ describe('ThreadRepositoryPostgres', () => {
             const threadId = await threadRepositoryPostgres.createThread('user-12345','judul','badan');
             const thread = await threadRepositoryPostgres.threadGet(threadId);
 
-            expect(typeof thread).toBe('object')
-            expect(typeof thread.id).toBe('string')
-            expect(thread.title).toBe('judul')
-            expect(thread.body).toBe('badan')
-            expect(typeof thread.date).toBe('string')
-            expect(thread.username).toBe('hilmatrix')
+            expect(typeof thread).toStrictEqual('object')
+            expect(thread.id.startsWith('thread')).toStrictEqual(true)
+            expect(isNaN(Date.parse(thread.date))).toStrictEqual(false)
+            expect(thread.title).toStrictEqual('judul')
+            expect(thread.body).toStrictEqual('badan')
+            expect(thread.username).toStrictEqual('hilmatrix')
         });
     });
     

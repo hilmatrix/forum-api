@@ -58,8 +58,8 @@ describe('/threads endpoint', () => {
               });
         
               const responseJson = JSON.parse(response.payload);
-              expect(response.statusCode).toEqual(401);
-              expect(responseJson.status).toEqual('fail');
+              expect(response.statusCode).toStrictEqual(401);
+              expect(responseJson.status).toStrictEqual('fail');
         });
 
         it('should response 201 when successful', async () => {
@@ -83,8 +83,8 @@ describe('/threads endpoint', () => {
               });
         
               const responseJson = JSON.parse(response.payload);
-              expect(response.statusCode).toEqual(201);
-              expect(responseJson.status).toEqual('success');
+              expect(response.statusCode).toStrictEqual(201);
+              expect(responseJson.status).toStrictEqual('success');
 
               threadId = responseJson.data.addedThread.id
         });
@@ -110,8 +110,8 @@ describe('/threads endpoint', () => {
               });
         
               const responseJson = JSON.parse(response.payload);
-              expect(response.statusCode).toEqual(200);
-              expect(responseJson.status).toEqual('success');
+              expect(response.statusCode).toStrictEqual(200);
+              expect(responseJson.status).toStrictEqual('success');
         });
     });
 });

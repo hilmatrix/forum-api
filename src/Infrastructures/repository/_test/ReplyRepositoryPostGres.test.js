@@ -28,11 +28,12 @@ describe('ReplyRepositoryPostGres', () => {
       });
 
       describe('addReply function', () => {
-        it('should return type of string', async () => {
+        it('should return type of string and starts with string reply', async () => {
             const replyRepositoryPostGres = new ReplyRepositoryPostGres(pool);
             const {commentId} = await RepliesTableTestHelper.createThreadWithComment()
             const replyId = await replyRepositoryPostGres.addReply('user-12345',commentId,'konten');
-            expect(typeof replyId).toBe('string')
+            expect(typeof replyId).toStrictEqual('string')
+            expect(replyId.startsWith('reply')).toStrictEqual(true)
         });
     });
 
@@ -59,12 +60,12 @@ describe('ReplyRepositoryPostGres', () => {
             await replyRepositoryPostGres.addReply('user-pembalas',commentId,'konten');
             const replies = await replyRepositoryPostGres.getReplies(commentId);
 
-            expect(typeof replies).toBe('object')
-            expect(typeof replies[0].id).toBe('string')
-            expect(replies[0].username).toBe('pembalas')
-            expect(typeof replies[0].date).toBe('string')
-            expect(replies[0].content).toBe('konten')
-            expect(replies[0].deleted).toBe(false)
+            expect(typeof replies).toStrictEqual('object')
+            expect(replies[0].id.startsWith('reply')).toStrictEqual(true)
+            expect(isNaN(Date.parse(replies[0].date))).toStrictEqual(false)
+            expect(replies[0].username).toStrictEqual('pembalas')
+            expect(replies[0].content).toStrictEqual('konten')
+            expect(replies[0].deleted).toStrictEqual(false)
         });
     });
 
@@ -76,7 +77,7 @@ describe('ReplyRepositoryPostGres', () => {
             const comments = await RepliesTableTestHelper.getComments(threadId);
 
             const replies = await replyRepositoryPostGres.getReplies(comments[0].id)
-            expect(replies[0].deleted).toBe(false)
+            expect(replies[0].deleted).toStrictEqual(false)
         });
 
         it('reply deleted should return true after deleted', async () => {
@@ -87,7 +88,7 @@ describe('ReplyRepositoryPostGres', () => {
             const comments = await RepliesTableTestHelper.getComments(threadId);
 
             const replies = await replyRepositoryPostGres.getReplies(comments[0].id)
-            expect(replies[0].deleted).toBe(true)
+            expect(replies[0].deleted).toStrictEqual(true)
         });
 
         it('should return InvariantError when not checking replyId first', async () => {
