@@ -27,8 +27,10 @@ describe('CommentAddUseCase', () => {
         expect(mockCommentRepository.addComment).toBeCalledWith(
             useCasePayload.userId, useCasePayload.threadId, useCasePayload.content);
 
-        expect(comment.id).toStrictEqual('comment-12345');
-        expect(comment.content).toStrictEqual('konten');
-        expect(comment.owner).toStrictEqual('hilmatrix');
+        expect(comment).toStrictEqual( {
+            id : 'comment-12345',
+            content : 'konten',
+            owner : 'hilmatrix'
+        });
     })
 })

@@ -6,7 +6,6 @@ const InvariantError = require('../../../Commons/exceptions/InvariantError');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 
 const pool = require('../../database/postgres/pool');
-const { nanoid } = require('nanoid');
 
 describe('CommentRepositoryPostGres', () => {
     beforeEach(async () => {
@@ -27,15 +26,27 @@ describe('CommentRepositoryPostGres', () => {
         await pool.end();
       });
 
-      describe('addComment function', () => {
-        it('should return type of string and starts with string comment', async () => {
+      describe('addComment and getComments function', () => {
+        it('should create comment correctly', async () => {
             const commentRepositoryPostGres = new CommentRepositoryPostGres(pool);
             const threadId = await CommentsTableTestHelper.createThread();
-            const commentId = await commentRepositoryPostGres.addComment('user-12345',threadId,'konten');
 
-            expect(typeof commentId).toStrictEqual('string')
-            expect(commentId.startsWith('comment')).toStrictEqual(true)
-            expect(commentId.length).toStrictEqual(`comment-${nanoid(16)}`.length)
+            commentRepositoryPostGres.generateId = jest.fn().mockImplementation(() => `comment-12345`);
+            commentRepositoryPostGres.generateDate = jest.fn().mockImplementation(() => `date-12345`);
+
+            const commentId = await commentRepositoryPostGres.addComment('user-komentator',threadId,'konten komentar');
+
+            expect(commentId).toStrictEqual(`comment-12345`) 
+
+            const comment = await CommentsTableTestHelper.getCommentById(commentId);
+
+            expect(comment).toStrictEqual({
+                id: "comment-12345", 
+                date: "date-12345", 
+                content: "konten komentar", 
+                deleted: false, 
+                username: "komentator"
+            })  
         });
     });
 
@@ -60,20 +71,35 @@ describe('CommentRepositoryPostGres', () => {
         it('should return comments correctly', async () => {
             const commentRepositoryPostGres = new CommentRepositoryPostGres(pool);
             const threadId = await CommentsTableTestHelper.createThread();
-            await commentRepositoryPostGres.addComment('user-komentator',threadId,'konten');
+
+            commentRepositoryPostGres.generateId = jest.fn().mockImplementation(() => `comment-1`);
+            commentRepositoryPostGres.generateDate = jest.fn().mockImplementation(() => `date-1`);
+
+            await commentRepositoryPostGres.addComment('user-komentator',threadId,'konten pertama');
+
+            commentRepositoryPostGres.generateId = jest.fn().mockImplementation(() => `comment-2`);
+            commentRepositoryPostGres.generateDate = jest.fn().mockImplementation(() => `date-2`);
+
+            await commentRepositoryPostGres.addComment('user-komentator',threadId,'konten kedua');
+
             const comments = await commentRepositoryPostGres.getComments(threadId);
 
-            expect(typeof comments).toStrictEqual('object')
-            
-            expect(comments[0].id.startsWith('comment')).toStrictEqual(true)
-            expect(comments[0].id.length).toStrictEqual(`comment-${nanoid(16)}`.length)
-
-            expect(isNaN(Date.parse(comments[0].date))).toStrictEqual(false)
-            expect(comments[0].date.length).toStrictEqual('YYYY-MM-DDTHH:mm:ss.SSS'.length)
-
-            expect(comments[0].username).toStrictEqual('komentator')
-            expect(comments[0].content).toStrictEqual('konten')
-            expect(comments[0].deleted).toStrictEqual(false)
+            expect(comments).toStrictEqual([
+                {
+                    id: "comment-1", 
+                    date: "date-1", 
+                    content: "konten pertama", 
+                    deleted: false, 
+                    username: "komentator"
+                },
+                {
+                    id: "comment-2", 
+                    date: "date-2", 
+                    content: "konten kedua", 
+                    deleted: false, 
+                    username: "komentator"
+                }
+            ])
         });
     });
     

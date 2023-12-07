@@ -26,6 +26,16 @@ const RepliesTableTestHelper = {
         
         return result.rows;
     },
+    async getReplyById(replyId) {
+        const query = {
+            text: `SELECT replies.id,username,replies.date,content,deleted FROM replies 
+                LEFT JOIN users ON replies.user_id = users.id where replies.id = $1`,
+            values: [replyId],
+        };
+        const result = await pool.query(query);
+
+        return result.rows[0];
+    },
     async cleanTable() {
         await pool.query('DELETE FROM replies WHERE 1=1');
         await pool.query('DELETE FROM comments WHERE 1=1');

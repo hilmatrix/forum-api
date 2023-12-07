@@ -16,11 +16,11 @@ describe('ThreadGetUseCase', () => {
         const mockReplyRepository = new ReplyRepository();
 
         mockCommentRepository.getComments = jest.fn().mockImplementation(() => Promise.resolve(
-            [{id : 'comment-1', deleted : false, content : 'haha'}]
+            [{id : 'comment-12345', deleted : false, content : 'haha', date :'date-1', username : 'hilman'}]
         ));
 
         mockReplyRepository.getReplies = jest.fn().mockImplementation(() => Promise.resolve(
-            [{id : 'reply-1', deleted : false, content : 'hihi'}]
+            [{id : 'reply-12345', deleted : false, content : 'hihi', date :'date-2', username : 'mauludin'}]
         ));
 
         mockThreadRepository.threadGet = jest.fn().mockImplementation(() => Promise.resolve(
@@ -36,28 +36,57 @@ describe('ThreadGetUseCase', () => {
         expect(mockThreadRepository.threadGet).toBeCalledWith(useCasePayload.threadId);
 
         expect(mockCommentRepository.getComments).toBeCalledWith('thread-12345');
-        expect(mockCommentRepository.getComments).toBeCalledWith('thread-12345');
+        expect(mockReplyRepository.getReplies).toBeCalledWith('comment-12345');
 
-        expect(thread.id).toStrictEqual('thread-12345');
-        expect(thread.title).toStrictEqual('judul');
-        expect(thread.username).toStrictEqual('hilmatrix');
-        expect(thread.body).toStrictEqual('body');
-        expect(thread.date).toStrictEqual('date-12345');
-        expect(thread.comments[0].content).toStrictEqual('haha');
-        expect(thread.comments[0].replies[0].content).toStrictEqual('hihi');
+        expect(thread).toStrictEqual({
+            id : 'thread-12345',
+            title : 'judul',
+            username : 'hilmatrix',
+            body : 'body',
+            date : 'date-12345',
+            comments : [{
+                id : 'comment-12345',
+                deleted : false,
+                content : 'haha',
+                date : 'date-1',
+                username : 'hilman',
+                replies : [{
+                    id : 'reply-12345',
+                    deleted : false,
+                    content : 'hihi',
+                    date : 'date-2',
+                    username : 'mauludin',
+                }]
+            }]
+        });
 
         mockCommentRepository.getComments = jest.fn().mockImplementation(() => Promise.resolve(
-            [{id : 'comment-1', deleted : true, content : 'haha'}]
+            [{id : 'comment-12345', deleted : true, content : 'haha'}]
         ));
 
         mockReplyRepository.getReplies = jest.fn().mockImplementation(() => Promise.resolve(
-            [{id : 'reply-1', deleted : true, content : 'hihi'}]
+            [{id : 'reply-12345', deleted : true, content : 'hihi'}]
         ));
 
         thread = await getThreadUseCase.execute(useCasePayload);
 
-        expect(thread.comments[0].content).toStrictEqual('**komentar telah dihapus**');
-        expect(thread.comments[0].replies[0].content).toStrictEqual('**balasan telah dihapus**');
+        expect(thread).toStrictEqual({
+            id : 'thread-12345',
+            title : 'judul',
+            username : 'hilmatrix',
+            body : 'body',
+            date : 'date-12345',
+            comments : [{
+                id : 'comment-12345',
+                deleted : true,
+                content : '**komentar telah dihapus**',
+                replies : [{
+                    id : 'reply-12345',
+                    deleted : true,
+                    content : '**balasan telah dihapus**'
+                }]
+            }]
+        });
 
         mockReplyRepository.getReplies = jest.fn().mockImplementation(() => Promise.resolve(undefined));
 

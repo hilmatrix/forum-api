@@ -7,7 +7,6 @@ const InvariantError = require('../../../Commons/exceptions/InvariantError');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 
 const pool = require('../../database/postgres/pool');
-const { nanoid } = require('nanoid');
 
 describe('ReplyRepositoryPostGres', () => {
     beforeEach(async () => {
@@ -29,14 +28,26 @@ describe('ReplyRepositoryPostGres', () => {
       });
 
       describe('addReply function', () => {
-        it('should return type of string and starts with string reply', async () => {
+        it('should create reply correctly', async () => {
             const replyRepositoryPostGres = new ReplyRepositoryPostGres(pool);
             const {commentId} = await RepliesTableTestHelper.createThreadWithComment()
-            const replyId = await replyRepositoryPostGres.addReply('user-12345',commentId,'konten');
 
-            expect(typeof replyId).toStrictEqual('string')
-            expect(replyId.startsWith('reply')).toStrictEqual(true)
-            expect(replyId.length).toStrictEqual(`reply-${nanoid(16)}`.length)
+            replyRepositoryPostGres.generateId = jest.fn().mockImplementation(() => `reply-12345`);
+            replyRepositoryPostGres.generateDate = jest.fn().mockImplementation(() => `date-12345`);
+
+            const replyId = await replyRepositoryPostGres.addReply('user-pembalas',commentId,'konten balasan');
+
+            expect(replyId).toStrictEqual(`reply-12345`) 
+
+            const reply = await RepliesTableTestHelper.getReplyById(replyId);
+
+            expect(reply).toStrictEqual({
+                id: "reply-12345", 
+                date: "date-12345", 
+                content: "konten balasan", 
+                deleted: false, 
+                username: "pembalas"
+            })  
         });
     });
 
@@ -60,20 +71,35 @@ describe('ReplyRepositoryPostGres', () => {
         it('should return replies correctly', async () => {
             const replyRepositoryPostGres = new ReplyRepositoryPostGres(pool);
             const {commentId} = await RepliesTableTestHelper.createThreadWithComment()
-            await replyRepositoryPostGres.addReply('user-pembalas',commentId,'konten');
+
+            replyRepositoryPostGres.generateId = jest.fn().mockImplementation(() => `reply-1`);
+            replyRepositoryPostGres.generateDate = jest.fn().mockImplementation(() => `date-1`);
+
+            await replyRepositoryPostGres.addReply('user-pembalas',commentId,'konten pertama');
+
+            replyRepositoryPostGres.generateId = jest.fn().mockImplementation(() => `reply-2`);
+            replyRepositoryPostGres.generateDate = jest.fn().mockImplementation(() => `date-2`);
+
+            await replyRepositoryPostGres.addReply('user-pembalas',commentId,'konten kedua');
+
             const replies = await replyRepositoryPostGres.getReplies(commentId);
 
-            expect(typeof replies).toStrictEqual('object')
-            
-            expect(replies[0].id.startsWith('reply')).toStrictEqual(true)
-            expect(replies[0].id.length).toStrictEqual(`reply-${nanoid(16)}`.length)
-
-            expect(isNaN(Date.parse(replies[0].date))).toStrictEqual(false)
-            expect(replies[0].date.length).toStrictEqual('YYYY-MM-DDTHH:mm:ss.SSS'.length)
-
-            expect(replies[0].username).toStrictEqual('pembalas')
-            expect(replies[0].content).toStrictEqual('konten')
-            expect(replies[0].deleted).toStrictEqual(false)
+            expect(replies).toStrictEqual([
+                {
+                    id: "reply-1", 
+                    date: "date-1", 
+                    content: "konten pertama", 
+                    deleted: false, 
+                    username: "pembalas"
+                },
+                {
+                    id: "reply-2", 
+                    date: "date-2", 
+                    content: "konten kedua", 
+                    deleted: false, 
+                    username: "pembalas"
+                }
+            ])
         });
     });
 

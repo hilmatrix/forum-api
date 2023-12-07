@@ -33,8 +33,10 @@ describe('ReplyAddUseCase', () => {
         expect(mockReplyRepository.addReply).toBeCalledWith(
             useCasePayload.userId, useCasePayload.commentId, useCasePayload.content);
 
-        expect(reply.id).toStrictEqual('reply-12345');
-        expect(reply.content).toStrictEqual('konten');
-        expect(reply.owner).toStrictEqual('hilmatrix');
+        expect(reply).toStrictEqual( {
+            id : 'reply-12345',
+            content : 'konten',
+            owner : 'hilmatrix'
+        });
     })
 })
