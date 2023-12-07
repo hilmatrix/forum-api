@@ -7,6 +7,7 @@ const InvariantError = require('../../../Commons/exceptions/InvariantError');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 
 const pool = require('../../database/postgres/pool');
+const { nanoid } = require('nanoid');
 
 describe('ReplyRepositoryPostGres', () => {
     beforeEach(async () => {
@@ -32,8 +33,10 @@ describe('ReplyRepositoryPostGres', () => {
             const replyRepositoryPostGres = new ReplyRepositoryPostGres(pool);
             const {commentId} = await RepliesTableTestHelper.createThreadWithComment()
             const replyId = await replyRepositoryPostGres.addReply('user-12345',commentId,'konten');
+
             expect(typeof replyId).toStrictEqual('string')
             expect(replyId.startsWith('reply')).toStrictEqual(true)
+            expect(replyId.length).toStrictEqual(`reply-${nanoid(16)}`.length)
         });
     });
 
@@ -61,8 +64,13 @@ describe('ReplyRepositoryPostGres', () => {
             const replies = await replyRepositoryPostGres.getReplies(commentId);
 
             expect(typeof replies).toStrictEqual('object')
+            
             expect(replies[0].id.startsWith('reply')).toStrictEqual(true)
+            expect(replies[0].id.length).toStrictEqual(`reply-${nanoid(16)}`.length)
+
             expect(isNaN(Date.parse(replies[0].date))).toStrictEqual(false)
+            expect(replies[0].date.length).toStrictEqual('YYYY-MM-DDTHH:mm:ss.SSS'.length)
+
             expect(replies[0].username).toStrictEqual('pembalas')
             expect(replies[0].content).toStrictEqual('konten')
             expect(replies[0].deleted).toStrictEqual(false)

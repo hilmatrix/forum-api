@@ -6,6 +6,7 @@ const InvariantError = require('../../../Commons/exceptions/InvariantError');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 
 const pool = require('../../database/postgres/pool');
+const { nanoid } = require('nanoid');
 
 describe('CommentRepositoryPostGres', () => {
     beforeEach(async () => {
@@ -31,8 +32,10 @@ describe('CommentRepositoryPostGres', () => {
             const commentRepositoryPostGres = new CommentRepositoryPostGres(pool);
             const threadId = await CommentsTableTestHelper.createThread();
             const commentId = await commentRepositoryPostGres.addComment('user-12345',threadId,'konten');
+
             expect(typeof commentId).toStrictEqual('string')
             expect(commentId.startsWith('comment')).toStrictEqual(true)
+            expect(commentId.length).toStrictEqual(`comment-${nanoid(16)}`.length)
         });
     });
 
@@ -61,8 +64,13 @@ describe('CommentRepositoryPostGres', () => {
             const comments = await commentRepositoryPostGres.getComments(threadId);
 
             expect(typeof comments).toStrictEqual('object')
+            
             expect(comments[0].id.startsWith('comment')).toStrictEqual(true)
+            expect(comments[0].id.length).toStrictEqual(`comment-${nanoid(16)}`.length)
+
             expect(isNaN(Date.parse(comments[0].date))).toStrictEqual(false)
+            expect(comments[0].date.length).toStrictEqual('YYYY-MM-DDTHH:mm:ss.SSS'.length)
+
             expect(comments[0].username).toStrictEqual('komentator')
             expect(comments[0].content).toStrictEqual('konten')
             expect(comments[0].deleted).toStrictEqual(false)

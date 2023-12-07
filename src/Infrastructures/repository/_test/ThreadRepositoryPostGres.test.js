@@ -1,7 +1,10 @@
 const ThreadRepositoryPostGres = require('../ThreadRepositoryPostGres');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
+
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
+
 const pool = require('../../database/postgres/pool');
+const { nanoid } = require('nanoid');
 
 describe('ThreadRepositoryPostgres', () => {
 
@@ -27,8 +30,10 @@ describe('ThreadRepositoryPostgres', () => {
         it('should return type of string and starts with string thread', async () => {
             const threadRepositoryPostgres = new ThreadRepositoryPostGres(pool);
             const threadId = await threadRepositoryPostgres.createThread('user-12345','judul','badan');
+
             expect(typeof threadId).toStrictEqual('string')
             expect(threadId.startsWith('thread')).toStrictEqual(true)
+            expect(threadId.length).toStrictEqual(`thread-${nanoid(16)}`.length)
         });
     });
 
@@ -57,8 +62,13 @@ describe('ThreadRepositoryPostgres', () => {
             const thread = await threadRepositoryPostgres.threadGet(threadId);
 
             expect(typeof thread).toStrictEqual('object')
+            
             expect(thread.id.startsWith('thread')).toStrictEqual(true)
+            expect(thread.id.length).toStrictEqual(`thread-${nanoid(16)}`.length)
+
             expect(isNaN(Date.parse(thread.date))).toStrictEqual(false)
+            expect(thread.date.length).toStrictEqual('YYYY-MM-DDTHH:mm:ss.SSS'.length)
+
             expect(thread.title).toStrictEqual('judul')
             expect(thread.body).toStrictEqual('badan')
             expect(thread.username).toStrictEqual('hilmatrix')
