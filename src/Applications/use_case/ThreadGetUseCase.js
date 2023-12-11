@@ -1,10 +1,11 @@
 const InvariantError = require('../../Commons/exceptions/InvariantError');
 
 class ThreadGetUseCase {
-    constructor({threadRepository, commentRepository, replyRepository}) {
+    constructor({threadRepository, commentRepository, replyRepository, likeRepository}) {
       this.threadRepository = threadRepository;
       this.commentRepository = commentRepository;
       this.replyRepository = replyRepository;
+      this.likeRepository = likeRepository;
     }
   
     async execute(useCasePayload) {
@@ -14,6 +15,9 @@ class ThreadGetUseCase {
       if (comments) {
         for(const comment of comments) {
           comment.replies = await this.replyRepository.getReplies(comment.id);
+
+          const likes = await this.likeRepository.getAllLikes(comment.id)
+          comment.likeCount = likes.length
 
           if (comment.deleted) {
             comment.content = '**komentar telah dihapus**';

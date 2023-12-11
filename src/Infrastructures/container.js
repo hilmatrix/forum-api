@@ -39,9 +39,9 @@ const CommentDeleteUseCase = require('../Applications/use_case/CommentDeleteUseC
 const ReplyAddUseCase = require('../Applications/use_case/ReplyAddUseCase');
 const ReplyDeleteUseCase = require('../Applications/use_case/ReplyDeleteUseCase');
 
-
-
-
+const LikeRepository = require('../Domains/likes/LikeRepository');
+const LikeRepositoryPostGres = require('./repository/LikeRepositoryPostGres');
+const LikeToggleUseCase = require('../Applications/use_case/LikeToggleUseCase');
 
 // creating container
 const container = createContainer();
@@ -98,6 +98,17 @@ container.register([
   {
     key: ReplyRepository.name,
     Class: ReplyRepositoryPostGres,
+    parameter: {
+      dependencies: [
+        {
+          concrete: pool,
+        },
+      ],
+    },
+  },
+  {
+    key: LikeRepository.name,
+    Class: LikeRepositoryPostGres,
     parameter: {
       dependencies: [
         {
@@ -273,6 +284,10 @@ container.register([
         {
           name: 'replyRepository',
           internal: ReplyRepository.name,
+        },
+        {
+          name: 'likeRepository',
+          internal: LikeRepository.name,
         }
       ],
     },
@@ -316,6 +331,23 @@ container.register([
         {
           name: 'authenticationTokenManager',
           internal: AuthenticationTokenManager.name,
+        }
+      ],
+    },
+  },
+  {
+    key: LikeToggleUseCase.name,
+    Class: LikeToggleUseCase,
+    parameter: {
+      injectType: 'destructuring',
+      dependencies: [
+        {
+          name: 'commentRepository',
+          internal: CommentRepository.name,
+        },
+        {
+          name: 'likeRepository',
+          internal: LikeRepository.name,
         }
       ],
     },

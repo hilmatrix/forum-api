@@ -1,6 +1,8 @@
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
+const LikeRepository = require('../../../Domains/likes/LikeRepository');
+
 const ThreadGetUseCase = require('../ThreadGetUseCase');
 const InvariantError = require('../../../Commons/exceptions/InvariantError');
 
@@ -14,6 +16,7 @@ describe('ThreadGetUseCase', () => {
         const mockThreadRepository = new ThreadRepository();
         const mockCommentRepository = new CommentRepository();
         const mockReplyRepository = new ReplyRepository();
+        const mockLikeRepository = new LikeRepository();
 
         mockCommentRepository.getComments = jest.fn().mockImplementation(() => Promise.resolve(
             [{id : 'comment-12345', deleted : false, content : 'haha', date :'date-1', username : 'hilman'}]
@@ -23,13 +26,19 @@ describe('ThreadGetUseCase', () => {
             [{id : 'reply-12345', deleted : false, content : 'hihi', date :'date-2', username : 'mauludin'}]
         ));
 
+        mockLikeRepository.getAllLikes = jest.fn().mockImplementation(() => Promise.resolve(
+            [{id : 'like-1', user_id : 'user-1', comment_id : 'comment-1'}]
+        ));
+
+
         mockThreadRepository.threadGet = jest.fn().mockImplementation(() => Promise.resolve(
             {id : 'thread-12345', title : 'judul', user_id : 'user-12345',
                 body : 'body', date : 'date-12345', username : 'hilmatrix'}));
 
   
         const getThreadUseCase = new ThreadGetUseCase({threadRepository: mockThreadRepository,
-            commentRepository: mockCommentRepository,replyRepository: mockReplyRepository});
+            commentRepository: mockCommentRepository,replyRepository: mockReplyRepository,
+            likeRepository: mockLikeRepository});
 
         let thread = await getThreadUseCase.execute(useCasePayload);
 
@@ -37,6 +46,7 @@ describe('ThreadGetUseCase', () => {
 
         expect(mockCommentRepository.getComments).toBeCalledWith('thread-12345');
         expect(mockReplyRepository.getReplies).toBeCalledWith('comment-12345');
+        expect(mockLikeRepository.getAllLikes).toBeCalledWith('comment-12345');
 
         expect(thread).toStrictEqual({
             id : 'thread-12345',
@@ -50,6 +60,7 @@ describe('ThreadGetUseCase', () => {
                 content : 'haha',
                 date : 'date-1',
                 username : 'hilman',
+                likeCount : 1,
                 replies : [{
                     id : 'reply-12345',
                     deleted : false,
@@ -80,6 +91,7 @@ describe('ThreadGetUseCase', () => {
                 id : 'comment-12345',
                 deleted : true,
                 content : '**komentar telah dihapus**',
+                likeCount : 1,
                 replies : [{
                     id : 'reply-12345',
                     deleted : true,
