@@ -3,7 +3,7 @@ const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper
 const container = require('../../container');
 const createServer = require('../createServer');
 
-describe('/comments endpoint', () => {
+describe('/replies endpoint', () => {
     let authorization;
     let threadId;
     let commentId;
