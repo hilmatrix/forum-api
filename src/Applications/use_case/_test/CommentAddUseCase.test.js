@@ -3,34 +3,35 @@ const CommentRepository = require('../../../Domains/comments/CommentRepository')
 const CommentAddUseCase = require('../CommentAddUseCase');
 
 describe('CommentAddUseCase', () => {
+  it('should orchestrating the add comment action correctly', async () => {
+    const useCasePayload = {
+      userId: 'user-12345',
+      username: 'hilmatrix',
+      threadId: 'thread-12345',
+      content: 'konten',
+    };
 
-    it('should orchestrating the add comment action correctly', async () => {
-        const useCasePayload = {
-            userId: 'user-12345',
-            username: 'hilmatrix',
-            threadId: 'thread-12345',
-            content: 'konten'
-        };
+    const mockThreadRepository = new ThreadRepository();
+    const mockCommentRepository = new CommentRepository();
 
-        const mockThreadRepository = new ThreadRepository();
-        const mockCommentRepository = new CommentRepository();
+    mockThreadRepository.verifyThreadExist = jest.fn().mockImplementation(() => Promise.resolve());
+    mockCommentRepository.addComment = jest.fn().mockImplementation(() => Promise.resolve('comment-12345'));
 
-        mockThreadRepository.verifyThreadExist = jest.fn().mockImplementation(() => Promise.resolve());
-        mockCommentRepository.addComment = jest.fn().mockImplementation(() => Promise.resolve('comment-12345'));
-  
-        const addCommentUseCase = new CommentAddUseCase({threadRepository: mockThreadRepository,
-            commentRepository: mockCommentRepository});
+    const addCommentUseCase = new CommentAddUseCase({
+      threadRepository: mockThreadRepository,
+      commentRepository: mockCommentRepository,
+    });
 
-        const comment = await addCommentUseCase.execute(useCasePayload);
+    const comment = await addCommentUseCase.execute(useCasePayload);
 
-        expect(mockThreadRepository.verifyThreadExist).toBeCalledWith(useCasePayload.threadId);
-        expect(mockCommentRepository.addComment).toBeCalledWith(
-            useCasePayload.userId, useCasePayload.threadId, useCasePayload.content);
+    expect(mockThreadRepository.verifyThreadExist).toBeCalledWith(useCasePayload.threadId);
+    expect(mockCommentRepository.addComment)
+      .toBeCalledWith(useCasePayload.userId, useCasePayload.threadId, useCasePayload.content);
 
-        expect(comment).toStrictEqual( {
-            id : 'comment-12345',
-            content : 'konten',
-            owner : 'hilmatrix'
-        });
-    })
-})
+    expect(comment).toStrictEqual({
+      id: 'comment-12345',
+      content: 'konten',
+      owner: 'hilmatrix',
+    });
+  });
+});

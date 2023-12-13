@@ -10,5 +10,5 @@ const routes = (handler) => ([
     handler: handler.deleteThreadCommentHandler,
   },
 ]);
-  
+
 module.exports = routes;

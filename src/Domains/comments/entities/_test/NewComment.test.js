@@ -4,8 +4,8 @@ describe('NewThread entities', () => {
   it('should throw error when payload does not contain needed property', () => {
     // Arrange
     const payload = {
-        userId: 'hilmatrix',
-        threadId: 'thread'
+      userId: 'hilmatrix',
+      threadId: 'thread',
     };
 
     // Action & Assert
@@ -15,9 +15,9 @@ describe('NewThread entities', () => {
   it('should throw error when payload not meet data type specification', () => {
     // Arrange
     const payload = {
-        userId: 'hilmatrix',
-        threadId: 'thread',
-        content: 3.14
+      userId: 'hilmatrix',
+      threadId: 'thread',
+      content: 3.14,
     };
 
     // Action & Assert
@@ -27,9 +27,9 @@ describe('NewThread entities', () => {
   it('should create NewComment entities correctly', () => {
     // Arrange
     const payload = {
-        userId: 'hilmatrix',
-        threadId: 'thread',
-        content: 'konten'
+      userId: 'hilmatrix',
+      threadId: 'thread',
+      content: 'konten',
     };
 
     // Action

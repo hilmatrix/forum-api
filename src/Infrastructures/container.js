@@ -229,7 +229,7 @@ container.register([
         {
           name: 'commentRepository',
           internal: CommentRepository.name,
-        }
+        },
       ],
     },
   },
@@ -250,7 +250,7 @@ container.register([
         {
           name: 'replyRepository',
           internal: ReplyRepository.name,
-        }
+        },
       ],
     },
   },
@@ -263,7 +263,7 @@ container.register([
         {
           name: 'threadRepository',
           internal: ThreadRepository.name,
-        }
+        },
       ],
     },
   },
@@ -288,7 +288,7 @@ container.register([
         {
           name: 'likeRepository',
           internal: LikeRepository.name,
-        }
+        },
       ],
     },
   },
@@ -301,7 +301,7 @@ container.register([
         {
           name: 'commentRepository',
           internal: CommentRepository.name,
-        }
+        },
       ],
     },
   },
@@ -318,7 +318,7 @@ container.register([
         {
           name: 'replyRepository',
           internal: ReplyRepository.name,
-        }
+        },
       ],
     },
   },
@@ -331,7 +331,7 @@ container.register([
         {
           name: 'authenticationTokenManager',
           internal: AuthenticationTokenManager.name,
-        }
+        },
       ],
     },
   },
@@ -348,7 +348,7 @@ container.register([
         {
           name: 'likeRepository',
           internal: LikeRepository.name,
-        }
+        },
       ],
     },
   },

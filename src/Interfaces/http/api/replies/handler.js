@@ -4,68 +4,70 @@ const ReplyDeleteUseCase = require('../../../../Applications/use_case/ReplyDelet
 const AuthenticationError = require('../../../../Commons/exceptions/AuthenticationError');
 
 class RepliesHandler {
-    constructor(container) {
-      this.container = container;
-      this.postThreadReplyAddHandler = this.postThreadReplyAddHandler.bind(this);
-      this.deleteThreadReplyHandler = this.deleteThreadReplyHandler.bind(this);
+  constructor(container) {
+    this.container = container;
+    this.postThreadReplyAddHandler = this.postThreadReplyAddHandler.bind(this);
+    this.deleteThreadReplyHandler = this.deleteThreadReplyHandler.bind(this);
+  }
+
+  async postThreadReplyAddHandler(request, h) {
+    const authorization = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
+    if (!authorization) {
+      throw new AuthenticationError('Missing authentication');
     }
 
-    async postThreadReplyAddHandler(request, h) {
-      const authorization = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
-      if (!authorization) {
-        throw new AuthenticationError('Missing authentication');
-      }
+    const getIdAndUsernameUseCase = this.container.getInstance(GetIdAndUsernameUseCase.name);
+    const { username, id: userId } = await getIdAndUsernameUseCase.execute({ authorization });
 
-      const getIdAndUsernameUseCase = this.container.getInstance(GetIdAndUsernameUseCase.name);
-      const {username, id : userId} = await getIdAndUsernameUseCase.execute({authorization});
+    const payload = {
+      username,
+      userId,
+      threadId: request.params.threadId,
+      commentId: request.params.commentId,
+      content: request.payload.content,
+    };
 
-      const payload = {
-          username, userId,
-          threadId : request.params.threadId,
-          commentId : request.params.commentId,
-          content : request.payload.content
-       }
-    
-       const threadAddReplyUseCase = this.container.getInstance(ReplyAddUseCase.name);
-       const {id, content, owner} = await threadAddReplyUseCase.execute(payload)
-    
-         const response = h.response({
-          status: 'success',
-          data: {
-            addedReply : {
-              id, content, owner
-            }
-          },
-        });
-        response.code(201);
-        return response;
-      }
-    
-      async deleteThreadReplyHandler(request, h) {
-       const authorization = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
-       if (!authorization) {
-         throw new AuthenticationError('Missing authentication');
-       } 
+    const threadAddReplyUseCase = this.container.getInstance(ReplyAddUseCase.name);
+    const { id, content, owner } = await threadAddReplyUseCase.execute(payload);
 
-       const getIdAndUsernameUseCase = this.container.getInstance(GetIdAndUsernameUseCase.name);
-       const {username, id : userId} = await getIdAndUsernameUseCase.execute({authorization});
+    const response = h.response({
+      status: 'success',
+      data: {
+        addedReply: {
+          id, content, owner,
+        },
+      },
+    });
+    response.code(201);
+    return response;
+  }
 
-       const payload = {
-          username, userId,
-          threadId : request.params.threadId,
-          commentId : request.params.commentId,
-          replyId : request.params.replyId
-       }
-    
-        const threadDeleteReplyUseCase = this.container.getInstance(ReplyDeleteUseCase.name);
-        await threadDeleteReplyUseCase.execute(payload);
-    
-        const response = h.response({
-          status: 'success',
-        });
-        response.code(200);
-        return response;
-      }
+  async deleteThreadReplyHandler(request, h) {
+    const authorization = request.headers.authorization ? request.headers.authorization.split(' ')[1] : null;
+    if (!authorization) {
+      throw new AuthenticationError('Missing authentication');
+    }
+
+    const getIdAndUsernameUseCase = this.container.getInstance(GetIdAndUsernameUseCase.name);
+    const { username, id: userId } = await getIdAndUsernameUseCase.execute({ authorization });
+
+    const payload = {
+      username,
+      userId,
+      threadId: request.params.threadId,
+      commentId: request.params.commentId,
+      replyId: request.params.replyId,
+    };
+
+    const threadDeleteReplyUseCase = this.container.getInstance(ReplyDeleteUseCase.name);
+    await threadDeleteReplyUseCase.execute(payload);
+
+    const response = h.response({
+      status: 'success',
+    });
+    response.code(200);
+    return response;
+  }
 }
 
 module.exports = RepliesHandler;
