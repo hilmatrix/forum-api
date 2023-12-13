@@ -1,6 +1,5 @@
 const Hapi = require('@hapi/hapi');
 const ClientError = require('../../Commons/exceptions/ClientError');
-const AuthenticationError = require('../../Commons/exceptions/AuthenticationError');
 const DomainErrorTranslator = require('../../Commons/exceptions/DomainErrorTranslator');
 const users = require('../../Interfaces/http/api/users');
 const authentications = require('../../Interfaces/http/api/authentications');
@@ -76,10 +75,10 @@ const createServer = async (container) => {
       // penanganan server error sesuai kebutuhan
       const newResponse = h.response({
         status: 'error',
-        message: `terjadi kegagalan pada server kami`,
+        message: 'terjadi kegagalan pada server kami',
       });
       newResponse.code(500);
-      console.log(`Response 500 : ${response}`)
+      console.log(`Response 500 : ${response}`);
 
       return newResponse;
     }

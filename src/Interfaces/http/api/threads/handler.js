@@ -17,23 +17,24 @@ class ThreadsHandler {
     }
 
     const getIdAndUsernameUseCase = this.container.getInstance(GetIdAndUsernameUseCase.name);
-    const {username, id : userId} = await getIdAndUsernameUseCase.execute({authorization});
+    const { username, id: userId } = await getIdAndUsernameUseCase.execute({ authorization });
 
     const payload = {
-       username, userId,
-       title : request.payload.title,
-       body : request.payload.body,
-    }
+      username,
+      userId,
+      title: request.payload.title,
+      body: request.payload.body,
+    };
 
     const threadCreateUseCase = this.container.getInstance(ThreadCreateUseCase.name);
-    const {id, title, owner} = await threadCreateUseCase.execute(payload);
+    const { id, title, owner } = await threadCreateUseCase.execute(payload);
 
     const response = h.response({
       status: 'success',
       data: {
-        addedThread : {
-          id, title, owner
-        }
+        addedThread: {
+          id, title, owner,
+        },
       },
     });
     response.code(201);
@@ -42,18 +43,20 @@ class ThreadsHandler {
 
   async getThreadHandler(request, h) {
     const payload = {
-      threadId : request.params.threadId
-   }
+      threadId: request.params.threadId,
+    };
 
     const threadGetUseCase = this.container.getInstance(ThreadGetUseCase.name);
-    const {id, title, body, date, data, username, comments} = await threadGetUseCase.execute(payload)
+    const {
+      id, title, body, date, data, username, comments,
+    } = await threadGetUseCase.execute(payload);
 
     const response = h.response({
       status: 'success',
       data: {
-        thread : {
-          id, title, body, date, data, username, comments
-        }
+        thread: {
+          id, title, body, date, data, username, comments,
+        },
       },
     });
     response.code(200);

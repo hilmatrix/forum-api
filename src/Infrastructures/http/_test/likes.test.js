@@ -4,110 +4,109 @@ const container = require('../../container');
 const createServer = require('../createServer');
 
 describe('/likes endpoint', () => {
-    let authorization;
-    let threadId;
-    let commentId;
+  let authorization;
+  let threadId;
+  let commentId;
 
-    beforeAll (async () => {
-        const requestPayload = {
-          username: 'hilmatrix',
-          password: '12345678',
-        };
-        const server = await createServer(container);
-        // add user
-        await server.inject({
-          method: 'POST',
-          url: '/users',
-          payload: {
-            username: 'hilmatrix',
-            password: '12345678',
-            fullname: 'Hilman Mauludin',
-          },
-        });
-  
-        // Action
-        const response = await server.inject({
-          method: 'POST',
-          url: '/authentications',
-          payload: requestPayload,
-        });
-  
-        // Assert
-        const responseJson = JSON.parse(response.payload); 
-        authorization = `bearer ${responseJson.data.accessToken}`
+  beforeAll(async () => {
+    const requestPayload = {
+      username: 'hilmatrix',
+      password: '12345678',
+    };
+    const server = await createServer(container);
+    // add user
+    await server.inject({
+      method: 'POST',
+      url: '/users',
+      payload: {
+        username: 'hilmatrix',
+        password: '12345678',
+        fullname: 'Hilman Mauludin',
+      },
+    });
 
-        ///////////////////////////////////////
+    // Action
+    const response = await server.inject({
+      method: 'POST',
+      url: '/authentications',
+      payload: requestPayload,
+    });
 
-        const threadPayload = {
-          title: 'judul',
-          body: 'badan'
-        };
+    // Assert
+    const responseJson = JSON.parse(response.payload);
+    authorization = `bearer ${responseJson.data.accessToken}`;
 
-          const threadResponse = await server.inject({
-            method: 'POST',
-            url: '/threads',
-            payload: threadPayload,
-            headers : {authorization}
-          });
-        
-          const threadResponseJson = JSON.parse(threadResponse.payload);
-          threadId = threadResponseJson.data.addedThread.id
+    /// ////////////////////////////////////
 
-        ////////////////////////////////////////////////
+    const threadPayload = {
+      title: 'judul',
+      body: 'badan',
+    };
 
-          const commentResponse = await server.inject({
-              method: 'POST',
-              url: `/threads/${threadId}/comments`,
-              payload: {content: 'judul'},
-              headers : {authorization}
-          });
+    const threadResponse = await server.inject({
+      method: 'POST',
+      url: '/threads',
+      payload: threadPayload,
+      headers: { authorization },
+    });
 
-          const commentResponseJson = JSON.parse(commentResponse.payload);
+    const threadResponseJson = JSON.parse(threadResponse.payload);
+    threadId = threadResponseJson.data.addedThread.id;
 
-          commentId = commentResponseJson.data.addedComment.id
+    /// /////////////////////////////////////////////
+
+    const commentResponse = await server.inject({
+      method: 'POST',
+      url: `/threads/${threadId}/comments`,
+      payload: { content: 'judul' },
+      headers: { authorization },
+    });
+
+    const commentResponseJson = JSON.parse(commentResponse.payload);
+
+    commentId = commentResponseJson.data.addedComment.id;
   });
 
   afterAll(async () => {
     LikesTableTestHelper.cleanTable();
     await pool.end();
   });
-  
+
   afterEach(async () => {
-  
+
   });
 
   describe('when PUT /threads/{threadId}/comments/{commentId}/likes', () => {
     it('should response 401 when request does not have authentication', async () => {
-        const server = await createServer(container);
+      const server = await createServer(container);
 
-        const response = await server.inject({
-            method: 'PUT',
-            url: `/threads/${threadId}/comments/${commentId}/likes`
-          });
-    
-          const responseJson = JSON.parse(response.payload);
-          expect(response.statusCode).toStrictEqual(401);
-          expect(responseJson.status).toStrictEqual('fail');
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+      });
+
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toStrictEqual(401);
+      expect(responseJson.status).toStrictEqual('fail');
     });
 
     it('should response 201 when successful', async () => {
+      const requestHeaders = {
+        authorization,
+      };
 
-        const requestHeaders = {
-            authorization
-        }
+      const server = await createServer(container);
 
-        const server = await createServer(container);
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+        headers: requestHeaders,
+      });
 
-        const response = await server.inject({
-            method: 'PUT',
-            url: `/threads/${threadId}/comments/${commentId}/likes`,
-            headers : requestHeaders
-          });
-    
-          const responseJson = JSON.parse(response.payload);
+      const responseJson = JSON.parse(response.payload);
 
-          expect(response.statusCode).toStrictEqual(200);
-          expect(responseJson.status).toStrictEqual('success');
-        });
+      expect(response.statusCode).toStrictEqual(200);
+      expect(responseJson.status).toStrictEqual('success');
     });
+  });
 });
